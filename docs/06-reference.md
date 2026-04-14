@@ -110,7 +110,7 @@ Groupes : core, secrets, python, terraform, docker, ansible, sql
 Setup des symlinks `~/.claude/` → framework (à lancer une fois sur nouvelle machine).
 
 ```bash
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]/claude-framework
 ./install.sh [--dry-run] [--force]
 ```
 

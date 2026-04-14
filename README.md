@@ -72,14 +72,14 @@ claude-framework/
 ### 1. Cloner le repo
 
 ```bash
-git clone <url> /datadisk/Inetum/claude-framework
+git clone <url> /[path-folder-projects]/claude-framework
 # ou n'importe où, ajuster ensuite
 ```
 
 ### 2. Lancer le script d'install
 
 ```bash
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]claude-framework
 ./install.sh
 ```
 
@@ -189,7 +189,7 @@ Gérée par Claude Code, **ne jamais ajouter au framework** :
 
 Pour enrichir le framework :
 
-1. Travailler directement dans `/datadisk/Inetum/claude-framework/` (les symlinks reflètent instantanément)
+1. Travailler directement dans `/[path-folder-projects]/claude-framework/` (les symlinks reflètent instantanément)
 2. Un skill s'enrichit via `/skill-enrich <nom>` (ajout en section `## Learnings`)
 3. Commit les changements (workflow GitFlow au choix, ou simple `main`)
 4. Sur une autre machine : `git pull` suffit

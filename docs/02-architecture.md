@@ -10,7 +10,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                      COUCHE GLOBALE                             │
 │                                                                 │
-│  /datadisk/Inetum/claude-framework/    (repo git, source)      │
+│  /[path-folder-projects]/claude-framework/    (repo git, source)      │
 │  ├── CLAUDE.md, GITFLOW.md, CODING_STANDARDS.md                │
 │  ├── skills/ (25)      agents/ (4)      hooks/ (4)             │
 │  ├── templates/ (5)    bin/ (2)         settings.json          │
@@ -51,7 +51,7 @@
 ### Pourquoi des symlinks depuis `~/.claude/` ?
 Claude Code cherche ses extensions **uniquement** dans `~/.claude/`. Impossible de lui dire « va voir ailleurs ». Les symlinks résolvent ça :
 - Claude Code voit tout dans `~/.claude/` comme attendu
-- La source reste dans `/datadisk/Inetum/claude-framework/` (versionnée)
+- La source reste dans `/[path-folder-projects]/claude-framework/` (versionnée)
 - Modifier un skill depuis le repo → Claude le voit instantanément
 - Tu peux travailler sur le framework depuis ton IDE comme sur n'importe quel projet
 
@@ -170,8 +170,8 @@ Si oui → écrit un fichier dans ~/.claude/projects/<projet>/memory/
 ### Sur une nouvelle machine
 
 ```bash
-git clone <url_framework> /datadisk/Inetum/claude-framework
-cd /datadisk/Inetum/claude-framework
+git clone <url_framework> /[path-folder-projects]/claude-framework
+cd /[path-folder-projects]/claude-framework
 ./install.sh
 # → crée ~/.claude/ avec les symlinks
 
@@ -184,7 +184,7 @@ Tu retrouves exactement le même environnement.
 ### Pour pousser vers un remote (GitHub privé par exemple)
 
 ```bash
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]/claude-framework
 git remote add origin git@github.com:<user>/claude-framework.git
 git push -u origin main
 ```
@@ -193,7 +193,7 @@ git push -u origin main
 
 Sur la machine où tu as fait des modifs :
 ```bash
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]/claude-framework
 git add -A
 git commit -m "enrich: terraform skill with MKS learnings"
 git push
@@ -201,7 +201,7 @@ git push
 
 Sur l'autre machine :
 ```bash
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]/claude-framework
 git pull
 # Les symlinks dans ~/.claude/ voient instantanément les changements.
 ```

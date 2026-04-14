@@ -12,8 +12,8 @@ Recettes courtes, actionnables, organisées par besoin.
 
 ```bash
 # 1. Cloner le framework
-git clone <url> /datadisk/Inetum/claude-framework
-cd /datadisk/Inetum/claude-framework
+git clone <url> /[path-folder-projects]/claude-framework
+cd /[path-folder-projects]/claude-framework
 
 # 2. Installer les symlinks ~/.claude/
 ./install.sh
@@ -42,8 +42,8 @@ ls -la ~/.claude/                              # doit montrer les symlinks
 ### Bootstraper un nouveau projet
 
 ```bash
-mkdir /datadisk/Inetum/mon-projet
-cd /datadisk/Inetum/mon-projet
+mkdir /[path-folder-projects]/mon-projet
+cd /[path-folder-projects]/mon-projet
 ~/.claude/bin/claude-init-project.sh
 ```
 
@@ -257,8 +257,8 @@ Claude va :
 ### Ajouter un nouveau skill
 
 ```bash
-mkdir /datadisk/Inetum/claude-framework/skills/mon-skill
-cat > /datadisk/Inetum/claude-framework/skills/mon-skill/SKILL.md <<'EOF'
+mkdir /[path-folder-projects]/claude-framework/skills/mon-skill
+cat > /[path-folder-projects]/claude-framework/skills/mon-skill/SKILL.md <<'EOF'
 ---
 name: mon-skill
 description: [quand l'invoquer, déclencheurs]
@@ -276,7 +276,7 @@ description: [quand l'invoquer, déclencheurs]
 EOF
 
 # Commit dans le framework
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]/claude-framework
 git add skills/mon-skill
 git commit -m "Ajoute skill mon-skill"
 ```
@@ -284,7 +284,7 @@ git commit -m "Ajoute skill mon-skill"
 ### Modifier un hook
 
 ```bash
-vim /datadisk/Inetum/claude-framework/hooks/gitflow-guard.sh
+vim /[path-folder-projects]/claude-framework/hooks/gitflow-guard.sh
 # Les symlinks font que ~/.claude/hooks/gitflow-guard.sh reflète instantanément
 # Tester :
 echo '{"tool_name":"Bash","tool_input":{"command":"git commit -m test"}}' \
@@ -301,10 +301,10 @@ echo "exit code: $?"
 ```bash
 # Diagnostic
 ls -la ~/.claude/CLAUDE.md
-# doit pointer vers /datadisk/Inetum/claude-framework/CLAUDE.md
+# doit pointer vers /[path-folder-projects]/claude-framework/CLAUDE.md
 
 # Réparer tous les symlinks
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]/claude-framework
 ./install.sh --force
 ```
 
@@ -315,7 +315,7 @@ cd /datadisk/Inetum/claude-framework
 cat ~/.claude/settings.json | jq '.hooks'
 
 # Vérifier qu'il est exécutable
-ls -l /datadisk/Inetum/claude-framework/hooks/
+ls -l /[path-folder-projects]/claude-framework/hooks/
 # doit être rwxr-xr-x
 
 # Tester manuellement
@@ -358,7 +358,7 @@ Le matcher doit être `"Edit|Write|MultiEdit"` et le fichier doit avoir extensio
 ### Le repo framework a un état bizarre
 
 ```bash
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]/claude-framework
 git status
 git log --oneline -5
 # Si besoin de repartir propre sans perdre les modifs :
@@ -374,7 +374,7 @@ git diff
 ### Mettre à jour depuis le remote
 
 ```bash
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]/claude-framework
 git fetch && git log --oneline HEAD..origin/main   # voir ce qui arrive
 git pull
 # Les symlinks voient instantanément les changements
@@ -383,7 +383,7 @@ git pull
 ### Pousser tes modifs locales
 
 ```bash
-cd /datadisk/Inetum/claude-framework
+cd /[path-folder-projects]/claude-framework
 git status
 git add -A
 git commit -m "enrich: ..."

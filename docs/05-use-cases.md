@@ -13,8 +13,8 @@ Tu crées un nouveau dépôt pour une API REST en Python.
 
 ### Déclencheur
 ```bash
-mkdir /datadisk/Inetum/mon-api
-cd /datadisk/Inetum/mon-api
+mkdir /[path-folder-projects]/mon-api
+cd /[path-folder-projects]/mon-api
 ~/.claude/bin/claude-init-project.sh
 ```
 
