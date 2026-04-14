@@ -159,14 +159,17 @@ info "Structure docs/ créée"
 
 # ----- 6. GitFlow -----
 if [[ $init_git_flow -eq 1 ]]; then
-    if command -v git-flow >/dev/null 2>&1; then
-        info "Init GitFlow via git-flow CLI"
-        git flow init -d >/dev/null 2>&1 || warn "git flow init : déjà fait ou erreur mineure"
+    # S'assurer que 'develop' existe (prérequis pour activer gitflow-guard.sh)
+    if git show-ref --verify --quiet refs/heads/develop; then
+        info "Branche develop déjà présente"
     else
-        warn "git-flow non installé — création manuelle de develop"
-        if ! git show-ref --verify --quiet refs/heads/develop; then
-            git checkout -b develop
-            git checkout "$current_branch"
+        # git-flow init refuse un working tree sale — fallback vers git branch (non destructif)
+        if command -v git-flow >/dev/null 2>&1 && git diff-index --quiet HEAD -- 2>/dev/null && git diff-index --quiet --cached HEAD -- 2>/dev/null; then
+            info "Init GitFlow via git-flow CLI"
+            git flow init -d >/dev/null 2>&1 || git branch develop
+        else
+            info "Création de la branche develop (git branch, non destructif)"
+            git branch develop
         fi
     fi
 fi
