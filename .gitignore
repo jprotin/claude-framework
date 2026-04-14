@@ -1,0 +1,17 @@
+# Rien à ignorer : ce repo ne contient que du code framework.
+# Les données runtime (sessions, cache, mémoire privée) vivent dans ~/.claude/
+# et ne sont JAMAIS importées ici.
+
+# Fichiers IDE éventuels
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Si jamais quelqu'un pose des logs par erreur
+*.log
+
+# Config locale d'install (crée par install.sh, ne doit pas être commitée si contient des paths spécifiques)
+.install.local

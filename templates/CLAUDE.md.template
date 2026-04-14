@@ -1,0 +1,45 @@
+# CLAUDE.md — {{PROJECT_NAME}}
+
+Instructions spécifiques à ce projet. Les règles globales (`~/.claude/CLAUDE.md`) s'appliquent aussi.
+
+---
+
+## Contexte projet
+
+- **Objectif** : <à remplir — ex: Landing zone IaC OVHcloud pour environnements sandbox>
+- **Stack** : <à remplir — ex: Terraform 1.9, OVHcloud provider, Kubernetes MKS>
+- **Statut** : <ex: en développement / production / legacy>
+- **Mainteneur(s)** : <nom(s)>
+
+## Contraintes / particularités
+
+- <ex: budget cloud mensuel plafonné à X €>
+- <ex: exigence RGPD, données UE uniquement>
+- <ex: déploiement manuel, pas de CI/CD automatique pour l'instant>
+
+## Environnements
+
+| Env | Région | Usage |
+|---|---|---|
+| <ex: sandbox-par> | <Paris> | <dev/test libre> |
+
+## Décisions clés (ADR en bref)
+
+- <décision 1 + raison>
+- <décision 2 + raison>
+
+Voir `docs/adr/` pour le détail.
+
+## Commandes essentielles
+
+```bash
+# <ex: déployer la sandbox>
+./infra.sh deploy sandbox-par
+
+# <ex: détruire>
+./infra.sh destroy sandbox-par
+```
+
+## Overrides des règles globales
+
+<aucun par défaut, compléter si besoin>

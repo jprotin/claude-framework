@@ -1,0 +1,109 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git show:*)",
+      "Bash(git blame:*)",
+      "Bash(git stash list:*)",
+      "Bash(git remote:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git ls-files:*)",
+      "Bash(terraform fmt:*)",
+      "Bash(terraform validate:*)",
+      "Bash(terraform plan:*)",
+      "Bash(terraform show:*)",
+      "Bash(terraform state list:*)",
+      "Bash(terraform state show:*)",
+      "Bash(terraform output:*)",
+      "Bash(tflint:*)",
+      "Bash(tfsec:*)",
+      "Bash(checkov:*)",
+      "Bash(ansible-lint:*)",
+      "Bash(ansible-inventory:*)",
+      "Bash(kubectl get:*)",
+      "Bash(kubectl describe:*)",
+      "Bash(kubectl logs:*)",
+      "Bash(kubectl config:*)",
+      "Bash(kubectl diff:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker images:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker inspect:*)",
+      "Bash(hadolint:*)",
+      "Bash(shellcheck:*)",
+      "Bash(shfmt:*)",
+      "Bash(yamllint:*)",
+      "Bash(markdownlint:*)",
+      "Bash(sqlfluff:*)",
+      "Bash(prettier:*)",
+      "Bash(eslint:*)",
+      "Bash(php-cs-fixer:*)",
+      "Bash(phpstan:*)",
+      "Bash(phpcs:*)",
+      "Bash(composer show:*)",
+      "Bash(composer outdated:*)",
+      "Bash(pre-commit run:*)",
+      "Bash(gitleaks detect:*)",
+      "Bash(detect-secrets scan:*)",
+      "Bash(npm list:*)",
+      "Bash(npm outdated:*)",
+      "Bash(npm audit:*)",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm outdated:*)",
+      "Bash(pip list:*)",
+      "Bash(pip show:*)",
+      "Bash(pip-audit:*)",
+      "Bash(pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(stat:*)",
+      "Bash(file:*)",
+      "Bash(which:*)",
+      "Bash(command -v:*)",
+      "Bash(echo:*)",
+      "Bash(chmod +x:*)",
+      "Bash(mkdir -p:*)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(rm -rf /*)",
+      "Bash(sudo rm:*)",
+      "Bash(dd if=*)",
+      "Bash(mkfs:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "/home/jprotin/.claude/hooks/gitflow-guard.sh" },
+          { "type": "command", "command": "/home/jprotin/.claude/hooks/danger-guard.sh" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "/home/jprotin/.claude/hooks/terraform-autofmt.sh" }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "/home/jprotin/.claude/hooks/context-injector.sh" }
+        ]
+      }
+    ]
+  }
+}
