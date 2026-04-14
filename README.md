@@ -6,6 +6,22 @@ Conçu pour être **réutilisable sur tous les projets** via symlinks depuis `~/
 
 ---
 
+## 📚 Documentation
+
+| Document | Quand le lire |
+|---|---|
+| [01 — Vue d'ensemble](docs/01-overview.md) | Pour comprendre ce qu'est ce framework et pour qui il est fait |
+| [02 — Architecture technique](docs/02-architecture.md) | Pour comprendre la séparation global/projet et les symlinks |
+| [03 — Mécanismes](docs/03-mechanisms.md) | Pour comprendre comment CLAUDE.md, hooks, skills, agents, memory fonctionnent |
+| [04 — Workflow](docs/04-workflow.md) | Pour comprendre le workflow méta + GitFlow + commits |
+| [05 — Cas d'usage end-to-end](docs/05-use-cases.md) | **7 scénarios concrets** : bootstrap, feature, hotfix, reprise, ADR, debug, audit sécu |
+| [06 — Référence](docs/06-reference.md) | Pour trouver rapidement une commande / skill / agent / outil |
+| [07 — Cookbook](docs/07-cookbook.md) | Recettes pratiques + troubleshooting |
+
+**Première lecture recommandée** : [01 Vue d'ensemble](docs/01-overview.md) → [05 Cas d'usage](docs/05-use-cases.md) (le reste en référence).
+
+---
+
 ## Structure
 
 ```
