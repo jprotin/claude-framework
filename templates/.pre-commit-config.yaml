@@ -79,10 +79,12 @@ repos:
         args:
           - "--args=--minimum-failure-severity=warning"
       - id: terraform_tfsec
+        exclude: ^examples/
       - id: terraform_checkov
         args:
           - "--args=--quiet"
           - "--args=--skip-check CKV_TF_1"
+          - "--args=--skip-path examples"
 
   # ---------- Docker ----------
   - repo: https://github.com/hadolint/hadolint
@@ -99,10 +101,17 @@ repos:
       - id: sqlfluff-fix
 
   # ---------- Ansible ----------
-  - repo: https://github.com/ansible/ansible-lint
-    rev: v24.10.0
+  # Utilise le binaire ansible-lint installé via pipx (voir claude-install-prereqs.sh --groups ansible)
+  # Plus fiable que la version en repo pre-commit (bugs de dépendances récurrents).
+  - repo: local
     hooks:
       - id: ansible-lint
+        name: ansible-lint (pipx)
+        entry: ansible-lint
+        language: system
+        files: \.(yml|yaml)$
+        exclude: ^(\.github|examples|docs)/
+        pass_filenames: true
 
   # ---------- Python ----------
   - repo: https://github.com/astral-sh/ruff-pre-commit
