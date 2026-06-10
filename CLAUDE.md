@@ -160,3 +160,5 @@ Au bootstrap d'un projet via `/onboard-project` :
 - Pas de résumé trailing de ce que je viens de faire (il lit le diff)
 - Pas d'emojis sauf demande explicite
 - Blocs de code pour tout ce qui est commande/fichier, même court
+
+@RTK.md
