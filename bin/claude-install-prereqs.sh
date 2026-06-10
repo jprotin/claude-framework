@@ -33,15 +33,16 @@ apt_updated=0
 
 # -------- Groupes --------
 declare -A GROUP_DESC=(
-    [core]="Indispensables (jq, shellcheck, shfmt, yamllint, git-flow, pipx, pre-commit)"
+    [core]="Indispensables (jq, yq, shellcheck, shfmt, yamllint, git-flow, pipx, pre-commit)"
     [secrets]="Détection de secrets (gitleaks, detect-secrets)"
     [python]="Outillage Python (ruff, mypy, black)"
     [terraform]="Terraform + IaC security (terraform, tflint, tfsec, checkov)"
     [docker]="Docker linting (hadolint)"
     [ansible]="Ansible linting (ansible-lint)"
     [sql]="SQL linting (sqlfluff)"
+    [kubernetes]="Kubernetes CLI (kubectl, helm, kubectx, stern, k9s)"
 )
-readonly GROUPS_ORDER=(core secrets python terraform docker ansible sql)
+readonly GROUPS_ORDER=(core secrets python terraform docker ansible sql kubernetes)
 
 # -------- Logging --------
 info()  { printf '[\e[34mINFO\e[0m]  %s\n' "$*" >&2; }
@@ -263,6 +264,13 @@ install_core() {
         "https://github.com/mvdan/sh/releases/download/{TAG}/shfmt_{TAG}_linux_amd64" \
         "shfmt"
 
+    # yq (Mike Farah, v4+) : parser YAML CLI. À privilégier vs le `yq` Python
+    # packagé par certaines distros (autre projet, syntaxe incompatible).
+    # Installé en binaire GitHub pour garantir la version v4+ (Go static binary).
+    github_install yq mikefarah/yq \
+        "https://github.com/mikefarah/yq/releases/download/{TAG}/yq_linux_amd64" \
+        "yq"
+
     pipx_ensure pre-commit
 }
 
@@ -338,10 +346,57 @@ install_sql() {
     pipx_ensure sqlfluff
 }
 
+install_kubernetes() {
+    printf '\n\e[1m=== Kubernetes ===\e[0m\n'
+
+    # kubectl : binaire officiel depuis dl.k8s.io (hors GitHub releases, URL spéciale)
+    local installed_ver=""
+    if command -v kubectl >/dev/null 2>&1; then
+        installed_ver="$(kubectl version --client -o json 2>/dev/null \
+            | grep -Po '"gitVersion":\s*"v\K[^"]+' | head -1)"
+    fi
+    local latest_ver
+    latest_ver="$(curl -fsSL https://dl.k8s.io/release/stable.txt 2>/dev/null | sed 's/^v//')"
+    if [[ -n "$installed_ver" ]] && [[ "$installed_ver" == "$latest_ver" ]] && [[ $force_upgrade -eq 0 ]]; then
+        ok "kubectl: $installed_ver (à jour)"
+    else
+        if [[ -z "$installed_ver" ]]; then
+            add "kubectl: v$latest_ver"
+        else
+            upg "kubectl: v$installed_ver → v$latest_ver"
+        fi
+        if [[ $dry_run -eq 0 ]]; then
+            curl -fsSL -o "$LOCAL_BIN/kubectl" \
+                "https://dl.k8s.io/release/v${latest_ver}/bin/linux/amd64/kubectl" \
+                && chmod +x "$LOCAL_BIN/kubectl" \
+                && ok "kubectl installé (v$latest_ver)" \
+                || fail "kubectl: téléchargement échoué"
+        fi
+    fi
+
+    # helm : GitHub releases (archive .tar.gz avec helm/helm binary dans linux-amd64/)
+    github_install helm helm/helm \
+        "https://get.helm.sh/helm-{TAG}-linux-amd64.tar.gz" \
+        "helm"
+
+    # stern : logs multi-pods, via GitHub releases
+    github_install stern stern/stern \
+        "https://github.com/stern/stern/releases/download/{TAG}/stern_{VER}_linux_amd64.tar.gz" \
+        "stern"
+
+    # k9s : TUI K8s, via GitHub releases
+    github_install k9s derailed/k9s \
+        "https://github.com/derailed/k9s/releases/download/{TAG}/k9s_Linux_amd64.tar.gz" \
+        "k9s"
+
+    # kubectx + kubens via apt (Ubuntu/Debian)
+    apt_ensure kubectx
+}
+
 # -------- Check mode --------
 
 declare -A TOOL_GROUP=(
-    [jq]=core [shellcheck]=core [shfmt]=core [yamllint]=core [git-flow]=core
+    [jq]=core [yq]=core [shellcheck]=core [shfmt]=core [yamllint]=core [git-flow]=core
     [pre-commit]=core [pipx]=core
     [gitleaks]=secrets [detect-secrets]=secrets
     [ruff]=python [mypy]=python [black]=python
@@ -349,6 +404,7 @@ declare -A TOOL_GROUP=(
     [hadolint]=docker
     [ansible-lint]=ansible
     [sqlfluff]=sql
+    [kubectl]=kubernetes [helm]=kubernetes [stern]=kubernetes [k9s]=kubernetes [kubectx]=kubernetes
 )
 
 check_all() {
@@ -362,7 +418,9 @@ check_all() {
         total=$((total+1))
         group="${TOOL_GROUP[$tool]}"
         if command -v "$tool" >/dev/null 2>&1; then
-            ver="$("$tool" --version 2>&1 | head -1 | head -c 80)"
+            # Certains outils (ex: git-flow) n'ont pas --version et peuvent planter / ouvrir un prompt.
+            # On tolère les échecs et on limite le temps d'exécution.
+            ver="$(timeout 3 "$tool" --version 2>&1 </dev/null | head -1 | sed 's/\x1b\[[0-9;]*m//g' | head -c 80 || echo "(version ?)")"
             printf '  \e[32m✓\e[0m %-18s [%-9s] %s\n' "$tool" "$group" "$ver"
         else
             printf '  \e[31m✗\e[0m %-18s [%-9s] \e[31mMANQUANT\e[0m\n' "$tool" "$group"
@@ -490,8 +548,9 @@ main() {
             terraform) install_terraform ;;
             docker)    install_docker ;;
             ansible)   install_ansible ;;
-            sql)       install_sql ;;
-            *)         warn "Groupe inconnu ignoré : $g" ;;
+            sql)        install_sql ;;
+            kubernetes) install_kubernetes ;;
+            *)          warn "Groupe inconnu ignoré : $g" ;;
         esac
     done
 
