@@ -90,9 +90,15 @@ info "Init dans: $(pwd)"
 if ! git rev-parse --git-dir >/dev/null 2>&1; then
     info "Initialisation du repo git"
     git init -b main
-    git commit --allow-empty -m "chore: initial commit" >/dev/null
 else
     info "Repo git déjà initialisé"
+fi
+
+# Garantir au moins un commit (HEAD non-né → git branch/flow échoue sinon).
+# Vaut aussi pour un repo déjà init'é mais sans commit.
+if ! git rev-parse --verify -q HEAD >/dev/null 2>&1; then
+    info "Aucun commit présent : création du commit initial"
+    git commit --allow-empty -m "chore: initial commit" >/dev/null
 fi
 
 current_branch=$(git branch --show-current)
@@ -172,6 +178,19 @@ if [[ $init_git_flow -eq 1 ]]; then
             git branch develop
         fi
     fi
+fi
+
+# ----- 6bis. Baseline detect-secrets (requise par le hook detect-secrets) -----
+if command -v detect-secrets >/dev/null 2>&1; then
+    if [[ -f .secrets.baseline ]]; then
+        info "Baseline detect-secrets déjà présente"
+    else
+        info "Génération de la baseline detect-secrets (.secrets.baseline)"
+        detect-secrets scan > .secrets.baseline
+    fi
+else
+    warn "detect-secrets non installé — baseline non générée (le hook detect-secrets échouera)"
+    warn "Installe-le puis lance : detect-secrets scan > .secrets.baseline"
 fi
 
 # ----- 7. Pre-commit install -----

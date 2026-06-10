@@ -30,7 +30,12 @@ nbproject/
 *.pfx
 credentials.json
 secrets.yaml
-.secrets.baseline
+# NB: .secrets.baseline (detect-secrets) DOIT être versionné — ne pas l'ignorer
+# OpenStack rc files (peuvent contenir des mots de passe)
+openrc*.sh
+# Kubeconfigs (contiennent des tokens d'accès cluster)
+kubeconfig*.yaml
+kubeconfig*.yml
 
 # ===== Logs =====
 *.log
