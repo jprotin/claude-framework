@@ -20,10 +20,12 @@ readonly LINK_ITEMS=(
     CODING_STANDARDS.md
     settings.json
     skills
+    commands
     agents
     hooks
     templates
     bin
+    docs
 )
 
 log()   { printf '[%s] %s\n' "$(date +'%H:%M:%S')" "$*"; }
