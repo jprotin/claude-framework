@@ -28,7 +28,9 @@ repos:
         args: ["--fix=lf"]
       - id: detect-private-key
       - id: no-commit-to-branch
-        args: ["--branch", "main", "--branch", "master", "--branch", "develop"]
+        # develop reçoit les merges feature/* en GitFlow → ne pas le bloquer ici
+        # (les commits de travail directs restent interdits par gitflow-guard.sh)
+        args: ["--branch", "main", "--branch", "master"]
 
   # ---------- Secrets ----------
   - repo: https://github.com/gitleaks/gitleaks

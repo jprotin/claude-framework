@@ -16,14 +16,17 @@ readonly SCRIPT_NAME="${0##*/}"
 # Items à symlinker (fichiers et dossiers)
 readonly LINK_ITEMS=(
     CLAUDE.md
+    RTK.md
     GITFLOW.md
     CODING_STANDARDS.md
     settings.json
     skills
+    commands
     agents
     hooks
     templates
     bin
+    docs
 )
 
 log()   { printf '[%s] %s\n' "$(date +'%H:%M:%S')" "$*"; }

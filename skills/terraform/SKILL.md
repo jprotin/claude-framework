@@ -210,3 +210,25 @@ terraform graph | dot -Tpng > graph.png  # graphique
 ## Learnings
 
 <!-- Enrichi via /skill-enrich terraform -->
+
+### 2026-04-15 — Contraintes de version providers : modules ↔ envs doivent s'intersecter
+Les `required_providers` d'un **module** et d'un **env** qui l'appelle sont combinés par intersection de contraintes. Si elles ne s'intersectent pas (ex: module `~> 2.0` + env `~> 0.46`), `terraform init` échoue avec "Inconsistent dependency lock file".
+
+**Quand :** ajout ou bump d'un provider dans un module existant.
+**Pourquoi :** incident 2026-04-15 sur projet OVH — bump mks/network/compute à une majeure non alignée avec les envs.
+**Règle :** aligner le module sur la contrainte des envs (la plus large réaliste), ne pas imposer de version majeure depuis le module. Si upgrade nécessaire, bumper env + module **en même temps**.
+
+### 2026-04-15 — OVH provider : `service_name` = ID tenant 32 hex, PAS le nom friendly
+Pour les ressources `ovh_cloud_project_*`, la variable `service_name` attend l'**ID tenant Public Cloud** (format hex 32 caractères, ex: `a1b2c3d4e5f6789012345678abcdef01`), PAS le nom affiché dans l'UI OVH.
+
+**Erreur typique :** `OVHcloud API error (status code 404): Client::NotFound: "This service does not exist"`.
+
+**Où trouver l'ID :** URL du Manager OVH → Public Cloud → projet → l'ID dans le path `/projects/XXXX/home`, ou via `ovhai project list`.
+
+### 2026-04-15 — Gitignore : couvrir `openrc*.sh` et `kubeconfig*.yaml`
+Les fichiers `openrc.sh` et `kubeconfig.yaml` peuvent exister en **plusieurs variantes** (ex: `openrc_PAR.sh`, `openrc_SBG.sh`, `kubeconfig-prod.yaml`). Un `.gitignore` qui n'exclut que `openrc.sh` laisse fuiter les variantes.
+
+**Règle :** toujours utiliser des patterns glob (`openrc*.sh`, `kubeconfig*.yaml`, `kubeconfig*.yml`) pour les fichiers sensibles multi-variantes.
+
+**Quand :** tout projet qui utilise plusieurs régions / environnements / clusters.
+**Pourquoi :** fuite évitée : sur le projet Sandbox OVH (2026-04-15), `openrc_PAR.sh` et `openrc_SBG.sh` étaient NOT ignored alors que `openrc.sh` l'était.

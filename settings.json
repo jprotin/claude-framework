@@ -88,6 +88,12 @@
           { "type": "command", "command": "/home/jprotin/.claude/hooks/gitflow-guard.sh" },
           { "type": "command", "command": "/home/jprotin/.claude/hooks/danger-guard.sh" }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "rtk hook claude" }
+        ]
       }
     ],
     "PostToolUse": [
