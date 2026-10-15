@@ -191,6 +191,9 @@ Workflow GitFlow détaillé (branches, tags, cycles feature/release/hotfix).
 ### `~/.claude/CODING_STANDARDS.md` → `framework/CODING_STANDARDS.md`
 Normes de code par langage : Terraform, Ansible, Python, JS/TS, PHP, SQL, NoSQL, Docker, Bash, Markdown.
 
+### `~/.claude/RTK.md` → `framework/RTK.md`
+Usage de RTK (proxy CLI de compression des sorties, branché en hook `PreToolUse`). La politique de compression sélective — quelles commandes, pourquoi, comment mesurer — est dans [Politique RTK](rtk-policy.md).
+
 ### `~/.claude/settings.json` ⇐ `framework/settings.json` + `~/.claude/settings.overlay.json`
 Fichier **généré** par `install.sh` (pas un symlink). Base versionnée : permissions (allowlist/denylist) + déclaration des hooks. Overlay local non versionné : config perso/client, notamment `autoMode`. Détails : [02 — Architecture](02-architecture.md#settingsjson--base-versionnée--overlay-local).
 

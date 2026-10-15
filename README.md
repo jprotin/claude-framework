@@ -17,6 +17,7 @@ Conçu pour être **réutilisable sur tous les projets** via symlinks depuis `~/
 | [05 — Cas d'usage end-to-end](docs/05-use-cases.md) | **7 scénarios concrets** : bootstrap, feature, hotfix, reprise, ADR, debug, audit sécu |
 | [06 — Référence](docs/06-reference.md) | Pour trouver rapidement une commande / skill / agent / outil |
 | [07 — Cookbook](docs/07-cookbook.md) | Recettes pratiques + troubleshooting |
+| [Politique RTK](docs/rtk-policy.md) | Avant d'activer/désactiver la compression RTK sur une commande : mesures, exclusions, limites connues |
 
 **Première lecture recommandée** : [01 Vue d'ensemble](docs/01-overview.md) → [05 Cas d'usage](docs/05-use-cases.md) (le reste en référence).
 
@@ -29,6 +30,7 @@ claude-framework/
 ├── CLAUDE.md                   # Instructions globales Claude (workflow, sécurité, règles transverses)
 ├── GITFLOW.md                  # Workflow GitFlow standardisé (cheatsheet danielkummer)
 ├── CODING_STANDARDS.md         # Normes de code par langage
+├── RTK.md                      # Usage de RTK (proxy CLI de compression) — politique dans docs/rtk-policy.md
 ├── settings.json               # Config Claude Code (permissions, hooks)
 ├── skills/                     # Compétences activables à la demande (25 skills)
 │   ├── architect/              # Solution Architect
