@@ -1,0 +1,15 @@
+/* Status badges pour les phases */
+.phase-done { color: #2e7d32; font-weight: bold; }
+.phase-active { color: #1565c0; font-weight: bold; }
+.phase-pending { color: #757575; }
+
+/* Améliore la lisibilité des tableaux de tasks */
+.md-typeset table:not([class]) th {
+  background-color: var(--md-primary-fg-color);
+  color: white;
+}
+
+/* Highlight bloquants dans les reviews */
+.md-typeset .admonition.danger {
+  border-left-color: #b71c1c;
+}
