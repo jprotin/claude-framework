@@ -70,6 +70,23 @@ Les dossiers **runtime** gérés par Claude Code, **non versionnés** car propre
 | `shell-snapshots/`, `session-env/`, `tasks/` | Runtime Claude |
 | `plugins/` | Géré par Claude Code |
 | `.credentials.json` | Tokens auth |
+| `settings.json` | **Généré** par `install.sh` (base du repo + overlay), voir ci-dessous |
+| `settings.overlay.json` | Config perso/client (ex. `autoMode`), jamais versionnée |
+
+### `settings.json` : base versionnée + overlay local
+
+`~/.claude/settings.json` n'est **pas** un symlink. `install.sh` le génère en fusionnant :
+
+1. `framework/settings.json` — base commune versionnée (permissions, hooks)
+2. `~/.claude/settings.overlay.json` — overlay local optionnel, non versionné, `chmod 600`
+
+Règles de fusion (`jq`) : objets fusionnés en profondeur, tableaux concaténés sans doublons, l'overlay gagne sur les valeurs scalaires.
+
+**Pourquoi un overlay ?** La clé `autoMode` (`environment`, `soft_deny`, …) n'est lue par Claude Code que depuis `~/.claude/settings.json`, les managed settings ou `--settings` — elle est ignorée dans `.claude/settings.json` et `.claude/settings.local.json` d'un projet, et `~/.claude/settings.local.json` n'existe pas. Or son contenu décrit l'infra d'un client (environnements, emplacement des secrets) et n'a rien à faire dans un repo générique.
+
+**Conséquences pratiques :**
+- Modifier la base ou l'overlay → relancer `./install.sh` (idempotent ; `--dry-run` disponible)
+- Une modif faite directement dans `~/.claude/settings.json` (ex. via `/config`) est **écrasée** à la prochaine génération : `install.sh` en garde une copie `settings.json.bak-<date>` et le signale, mais il faut la reporter dans l'overlay pour la conserver
 
 ---
 

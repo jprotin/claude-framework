@@ -19,7 +19,6 @@ readonly LINK_ITEMS=(
     RTK.md
     GITFLOW.md
     CODING_STANDARDS.md
-    settings.json
     skills
     commands
     agents
@@ -28,6 +27,13 @@ readonly LINK_ITEMS=(
     bin
     docs
 )
+
+# settings.json n'est PAS symlinké : il est généré = base du repo + overlay local.
+# La clé autoMode n'est lue que depuis ~/.claude/settings.json (ignorée dans les
+# settings projet), d'où un overlay non versionné pour la config perso/client.
+readonly SETTINGS_BASE="$FRAMEWORK_DIR/settings.json"
+readonly SETTINGS_OVERLAY="$CLAUDE_DIR/settings.overlay.json"
+readonly SETTINGS_TARGET="$CLAUDE_DIR/settings.json"
 
 log()   { printf '[%s] %s\n' "$(date +'%H:%M:%S')" "$*"; }
 info()  { log "INFO  $*"; }
@@ -51,6 +57,11 @@ Options:
 
 Items symlinkés:
   ${LINK_ITEMS[@]}
+
+settings.json est généré (pas symlinké) : fusion de la base du repo et de
+l'overlay local non versionné ~/.claude/settings.overlay.json (s'il existe).
+Objets fusionnés en profondeur, tableaux concaténés (sans doublons), l'overlay
+gagne sur les scalaires. Relancer ce script après toute modif de l'un des deux.
 
 Les dossiers runtime de Claude Code (projects/, sessions/, cache/, ...) ne sont
 PAS touchés — ils restent dans ~/.claude/ comme dossiers réels.
@@ -85,6 +96,12 @@ info "Claude dir:    $CLAUDE_DIR"
 for item in "${LINK_ITEMS[@]}"; do
     [[ -e "$FRAMEWORK_DIR/$item" ]] || die "Manquant dans le framework: $item"
 done
+
+command -v jq >/dev/null 2>&1 || die "jq requis pour générer settings.json"
+jq empty "$SETTINGS_BASE" || die "JSON invalide: $SETTINGS_BASE"
+if [[ -e "$SETTINGS_OVERLAY" ]]; then
+    jq empty "$SETTINGS_OVERLAY" || die "JSON invalide: $SETTINGS_OVERLAY"
+fi
 
 # -------- Préparer ~/.claude/ --------
 if [[ ! -d "$CLAUDE_DIR" ]]; then
@@ -156,6 +173,48 @@ for item in "${LINK_ITEMS[@]}"; do
     run ln -s "$src" "$dst"
     add "$item"
 done
+
+# -------- Générer settings.json (base + overlay) --------
+info "Génération de settings.json"
+overlay_src="$SETTINGS_OVERLAY"
+[[ -e "$overlay_src" ]] || overlay_src=/dev/null
+
+generated="$(mktemp)"
+trap 'rm -f "$generated"' EXIT
+# shellcheck disable=SC2016  # $variables jq, pas shell
+jq -n --slurpfile base "$SETTINGS_BASE" --slurpfile overlay "$overlay_src" '
+    def merge(a; b):
+        if (a | type) == "object" and (b | type) == "object" then
+            reduce (b | keys_unsorted[]) as $k (a; .[$k] = merge(a[$k]; b[$k]))
+        elif (a | type) == "array" and (b | type) == "array" then
+            a + (b - a)
+        elif b == null then a
+        else b
+        end;
+    merge($base[0]; $overlay[0] // {})
+' > "$generated"
+
+if [[ -L "$SETTINGS_TARGET" ]]; then
+    # Ancienne installation : settings.json était un symlink vers le repo
+    run rm "$SETTINGS_TARGET"
+elif [[ -e "$SETTINGS_TARGET" ]] && ! cmp -s "$generated" "$SETTINGS_TARGET"; then
+    # Contenu divergent (ex. modif via /config) : on garde une copie avant écrasement
+    settings_backup="$SETTINGS_TARGET.bak-$(date +%Y%m%d-%H%M%S)"
+    warn "settings.json diffère du résultat généré, backup vers $settings_backup"
+    warn "Reporter dans $SETTINGS_OVERLAY toute modif locale à conserver."
+    run cp -p "$SETTINGS_TARGET" "$settings_backup"
+fi
+
+if [[ -e "$SETTINGS_TARGET" ]] && cmp -s "$generated" "$SETTINGS_TARGET"; then
+    ok "settings.json (à jour)"
+else
+    run install -m 600 "$generated" "$SETTINGS_TARGET"
+    if [[ "$overlay_src" == /dev/null ]]; then
+        add "settings.json (base seule, pas d'overlay)"
+    else
+        add "settings.json (base + overlay)"
+    fi
+fi
 
 # -------- Résumé --------
 cat <<EOF

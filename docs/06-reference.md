@@ -191,8 +191,8 @@ Workflow GitFlow détaillé (branches, tags, cycles feature/release/hotfix).
 ### `~/.claude/CODING_STANDARDS.md` → `framework/CODING_STANDARDS.md`
 Normes de code par langage : Terraform, Ansible, Python, JS/TS, PHP, SQL, NoSQL, Docker, Bash, Markdown.
 
-### `~/.claude/settings.json` → `framework/settings.json`
-Permissions Claude Code (allowlist/denylist) + déclaration des hooks.
+### `~/.claude/settings.json` ⇐ `framework/settings.json` + `~/.claude/settings.overlay.json`
+Fichier **généré** par `install.sh` (pas un symlink). Base versionnée : permissions (allowlist/denylist) + déclaration des hooks. Overlay local non versionné : config perso/client, notamment `autoMode`. Détails : [02 — Architecture](02-architecture.md#settingsjson--base-versionnée--overlay-local).
 
 ---
 
