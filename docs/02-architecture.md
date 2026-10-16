@@ -70,6 +70,7 @@ Les dossiers **runtime** gérés par Claude Code, **non versionnés** car propre
 | `shell-snapshots/`, `session-env/`, `tasks/` | Runtime Claude |
 | `plugins/` | Géré par Claude Code |
 | `.credentials.json` | Tokens auth |
+| `skills/synced/` | Skills du compte claude.ai synchronisées par Claude Code. Atterrit dans le repo via le symlink `skills/` → ignoré par `.gitignore`, ne pas supprimer |
 | `settings.json` | **Généré** par `install.sh` (base du repo + overlay), voir ci-dessous |
 | `settings.overlay.json` | Config perso/client (ex. `autoMode`), jamais versionnée |
 
