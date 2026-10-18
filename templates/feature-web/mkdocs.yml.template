@@ -1,6 +1,6 @@
 site_name: "Features — {{PROJECT_NAME}}"
 docs_dir: "{{FEATURES_PATH}}"
-site_dir: "{{FEATURES_PATH}}/.site"
+site_dir: "{{SITE_PATH}}"
 
 theme:
   name: material

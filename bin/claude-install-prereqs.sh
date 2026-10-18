@@ -41,8 +41,9 @@ declare -A GROUP_DESC=(
     [ansible]="Ansible linting (ansible-lint)"
     [sql]="SQL linting (sqlfluff)"
     [kubernetes]="Kubernetes CLI (kubectl, helm, kubectx, stern, k9s)"
+    [agentic]="Pipeline /feature : interface web (mkdocs + material + awesome-pages)"
 )
-readonly GROUPS_ORDER=(core secrets python terraform docker ansible sql kubernetes)
+readonly GROUPS_ORDER=(core secrets python terraform docker ansible sql kubernetes agentic)
 
 # -------- Logging --------
 info()  { printf '[\e[34mINFO\e[0m]  %s\n' "$*" >&2; }
@@ -145,8 +146,10 @@ apt_ensure_any() {
 }
 
 # -------- pipx helper --------
+# pipx_ensure <paquet> [spec]  — spec optionnelle pour contraindre la version (ex. 'mkdocs<2')
 pipx_ensure() {
     local pkg="$1"
+    local spec="${2:-$1}"
     if ! command -v pipx >/dev/null; then
         fail "pipx manquant — installe d'abord le groupe 'core'"
         return 1
@@ -159,9 +162,38 @@ pipx_ensure() {
             ok "pipx: $pkg"
         fi
     else
-        add "pipx: $pkg"
-        run pipx install "$pkg" >/dev/null
+        add "pipx: $spec"
+        run pipx install "$spec" >/dev/null
     fi
+}
+
+# Injecte des dépendances (plugins) dans le venv pipx d'une application déjà installée
+pipx_inject() {
+    local app="$1"; shift
+    local dep injected
+    if ! pipx list --short 2>/dev/null | awk '{print $1}' | grep -qx "$app"; then
+        if [[ $dry_run -eq 1 ]]; then
+            for dep in "$@"; do add "pipx inject $app: $dep"; done
+            return 0
+        fi
+        fail "pipx: $app absent, injection impossible"
+        return 1
+    fi
+    injected="$(pipx list --json 2>/dev/null \
+        | jq -r --arg app "$app" '.venvs[$app].metadata.injected_packages // {} | keys[]')"
+    for dep in "$@"; do
+        if grep -qx "$dep" <<< "$injected"; then
+            if [[ $force_upgrade -eq 1 ]]; then
+                upg "pipx inject $app: $dep"
+                run pipx inject --force "$app" "$dep" >/dev/null
+            else
+                ok "pipx inject $app: $dep"
+            fi
+        else
+            add "pipx inject $app: $dep"
+            run pipx inject "$app" "$dep" >/dev/null
+        fi
+    done
 }
 
 # -------- GitHub releases helper --------
@@ -393,6 +425,15 @@ install_kubernetes() {
     apt_ensure kubectx
 }
 
+install_agentic() {
+    printf '\n\e[1m=== Agentic (pipeline /feature) ===\e[0m\n'
+    # mkdocs-material ne fournit pas la commande 'mkdocs' : on installe mkdocs
+    # et on injecte le thème + le plugin dans le même venv pipx.
+    # mkdocs<2 : la 2.0 supprime le système de plugins et casse material.
+    pipx_ensure mkdocs 'mkdocs<2'
+    pipx_inject mkdocs mkdocs-material mkdocs-awesome-pages-plugin
+}
+
 # -------- Check mode --------
 
 declare -A TOOL_GROUP=(
@@ -405,6 +446,7 @@ declare -A TOOL_GROUP=(
     [ansible-lint]=ansible
     [sqlfluff]=sql
     [kubectl]=kubernetes [helm]=kubernetes [stern]=kubernetes [k9s]=kubernetes [kubectx]=kubernetes
+    [mkdocs]=agentic
 )
 
 check_all() {
@@ -550,6 +592,7 @@ main() {
             ansible)   install_ansible ;;
             sql)        install_sql ;;
             kubernetes) install_kubernetes ;;
+            agentic)    install_agentic ;;
             *)          warn "Groupe inconnu ignoré : $g" ;;
         esac
     done

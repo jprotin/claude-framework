@@ -102,16 +102,16 @@ Installe / met à jour les outils prérequis.
   --upgrade          Force la mise à jour
   --no-sudo          User-space uniquement (skip apt)
 
-Groupes : core, secrets, python, terraform, docker, ansible, sql
+Groupes : core, secrets, python, terraform, docker, ansible, sql, kubernetes, agentic
 ```
 
 ### `install.sh` (à la racine du framework)
 
-Setup des symlinks `~/.claude/` → framework (à lancer une fois sur nouvelle machine).
+Setup des symlinks `~/.claude/` → framework, génération de `settings.json`, puis installation du groupe de prérequis `agentic` (mkdocs pour `/feature-serve`). À lancer sur nouvelle machine et après chaque `git pull` du framework.
 
 ```bash
 cd /[path-folder-projects]/claude-framework
-./install.sh [--dry-run] [--force]
+./install.sh [--dry-run] [--force] [--no-prereqs]
 ```
 
 ---
@@ -177,6 +177,13 @@ cd /[path-folder-projects]/claude-framework
 | Outil | Source | Rôle |
 |---|---|---|
 | `sqlfluff` | pipx | Linter/formatter SQL multi-dialect |
+
+### Groupe `agentic` (installé aussi par `install.sh`)
+| Outil | Source | Rôle |
+|---|---|---|
+| `mkdocs` (`<2`) | pipx | Moteur de l'interface web `/feature-serve`. Version < 2 : la 2.0 supprime les plugins |
+| `mkdocs-material` | pipx inject | Thème de l'interface |
+| `mkdocs-awesome-pages-plugin` | pipx inject | Navigation auto des artéfacts de feature |
 
 ---
 

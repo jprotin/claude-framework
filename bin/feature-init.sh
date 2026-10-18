@@ -137,14 +137,18 @@ EOF
 cp "${FRAMEWORK_DIR}/templates/feature-web/extra.css" "${ASSETS_DIR}/extra.css" 2>/dev/null || true
 
 # ── mkdocs.yml projet ─────────────────────────────────────────────────────
-# Générer ou mettre à jour le mkdocs.yml à la racine du répertoire features
+# Config dans un dossier voisin de features/ : mkdocs refuse un docs_dir parent
+# du fichier de config (et un site_dir inclus dans docs_dir).
 
-MKDOCS_YML="${FEATURES_DIR}/mkdocs.yml"
+WEB_DIR="${PROJECT_ROOT}/.claude/features-web"
+MKDOCS_YML="${WEB_DIR}/mkdocs.yml"
+mkdir -p "${WEB_DIR}"
 
 if [[ ! -f "${MKDOCS_YML}" ]]; then
   sed \
     -e "s|{{PROJECT_NAME}}|${PROJECT_NAME}|g" \
     -e "s|{{FEATURES_PATH}}|${FEATURES_DIR}|g" \
+    -e "s|{{SITE_PATH}}|${WEB_DIR}/.site|g" \
     "${FRAMEWORK_DIR}/templates/feature-web/mkdocs.yml.template" \
     > "${MKDOCS_YML}"
   echo "[feature-init] mkdocs.yml créé : ${MKDOCS_YML}"

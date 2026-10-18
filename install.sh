@@ -54,6 +54,7 @@ Options:
   -h, --help        Aide
   --dry-run         Affiche ce qui serait fait sans rien modifier
   --force           Écrase sans backup les liens/fichiers existants dans ~/.claude/
+  --no-prereqs      Ne pas installer les outils du groupe 'agentic' (mkdocs pour /feature)
 
 Items symlinkés:
   ${LINK_ITEMS[@]}
@@ -71,12 +72,14 @@ EOF
 
 dry_run=0
 force=0
+skip_prereqs=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -h|--help) usage; exit 0 ;;
         --dry-run) dry_run=1; shift ;;
         --force)   force=1; shift ;;
+        --no-prereqs) skip_prereqs=1; shift ;;
         *)         die "Option inconnue: $1" ;;
     esac
 done
@@ -214,6 +217,15 @@ else
     else
         add "settings.json (base + overlay)"
     fi
+fi
+
+# -------- Outils du pipeline /feature (groupe 'agentic', + 'core' implicite) --------
+if [[ $skip_prereqs -eq 0 ]]; then
+    info "Installation des outils du groupe 'agentic' (désactivable : --no-prereqs)"
+    prereqs_args=(--groups agentic)
+    [[ $dry_run -eq 1 ]] && prereqs_args+=(--dry-run)
+    "$FRAMEWORK_DIR/bin/claude-install-prereqs.sh" "${prereqs_args[@]}" \
+        || warn "Prérequis 'agentic' incomplets — relancer : $CLAUDE_DIR/bin/claude-install-prereqs.sh --groups agentic"
 fi
 
 # -------- Résumé --------
