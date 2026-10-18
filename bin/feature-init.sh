@@ -12,7 +12,7 @@ FRAMEWORK_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 FEATURES_DIR="${PROJECT_ROOT}/.claude/features"
 FEATURE_DIR="${FEATURES_DIR}/${SLUG}"
-ASSETS_DIR="${FEATURE_DIR}/assets"
+ASSETS_DIR="${FEATURES_DIR}/assets"  # partagé : extra_css est résolu depuis docs_dir (= features/)
 
 # ── Créer l'arborescence ───────────────────────────────────────────────────
 
