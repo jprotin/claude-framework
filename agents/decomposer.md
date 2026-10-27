@@ -84,6 +84,7 @@ Si une task dépasse 5 pts, la découper en sous-tasks.
 
 ## Résumé
 
+<!-- Tableau lu par feature-tasks.py import (kanban) : garder ces en-têtes et une ligne par task. -->
 | ID | Type | Titre | Deps | Pts | Statut |
 |---|---|---|---|---|---|
 | TASK-01 | SETUP | ... | — | 1 | pending |
