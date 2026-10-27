@@ -1,0 +1,54 @@
+B	rm -rf /home/user/projet
+P	rm -rf node_modules
+B	git reset --hard HEAD~1
+B	git branch -D feature/x
+B	terraform destroy
+B	terraform apply
+P	terraform apply -help
+P	terraform plan
+B	psql -c "DROP TABLE users"
+B	git commit --no-verify -m x
+P	git status
+B	kubectl apply -f x.yaml
+B	rtk kubectl apply -f x.yaml
+B	sudo kubectl delete pod x
+P	kubectl apply -f x --dry-run=client
+P	kubectl apply -f x --dry-run=server
+P	kubectl apply -f x --dry-run
+B	kubectl apply -f x --dry-run=none
+B	kubectl delete pod x
+P	kubectl delete pod x --dry-run=server
+P	kubectl get pods
+P	kubectl -n prod get pods
+P	kubectl --context=prod logs x
+P	kubectl rollout status deploy/x
+B	kubectl rollout restart deploy/x
+B	kubectl -n prod rollout undo deploy/x
+P	kubectl logs x
+B	kubectl uncordon n1
+P	kubectl config set-context x
+B	kubectl -n prod apply -f x.yaml
+B	kubectl --context prod delete pod x
+B	kubectl --context=prod --kubeconfig ~/.kube/c scale deploy/x --replicas=0
+B	kubectl apply -f a --dry-run=client && kubectl delete ns prod
+B	kubectl get pods; kubectl delete ns prod
+P	kubectl apply -f a --dry-run=client && kubectl get pods
+P	kubectl get pods | grep apply
+B	helm upgrade x .
+B	helm -n prod upgrade x .
+B	helm --kube-context prod uninstall x
+P	helm list
+P	helm -n prod list
+B	argocd app sync x
+B	argocd --grpc-web app sync x
+P	argocd app get x
+B	docker push img
+B	podman push img
+B	docker image push img
+B	docker --context remote push img
+B	docker buildx build --push -t img .
+P	docker build -t img .
+P	docker buildx build -t img .
+P	docker image ls
+B	./genai.sh infra deploy
+P	./genai.sh infra plan

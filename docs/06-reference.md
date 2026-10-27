@@ -102,16 +102,75 @@ Installe / met à jour les outils prérequis.
   --upgrade          Force la mise à jour
   --no-sudo          User-space uniquement (skip apt)
 
-Groupes : core, secrets, python, terraform, docker, ansible, sql
+Groupes : core, secrets, python, terraform, docker, ansible, sql, kubernetes, agentic
 ```
+
+### `feature-hub.sh` et `feature-serve.sh`
+
+Une seule interface web pour les features de **tous** les projets : un onglet par projet.
+`feature-init.sh` inscrit le projet automatiquement ; `feature-serve.sh` régénère le hub
+(`~/.claude/features-hub/`) puis le sert sur http://localhost:8888.
+
+```bash
+~/.claude/bin/feature-hub.sh list                          # projets inscrits
+~/.claude/bin/feature-hub.sh register <nom> [racine]       # inscrire un projet à la main
+~/.claude/bin/feature-hub.sh unregister <nom>              # le retirer (fichiers intacts)
+~/.claude/bin/feature-serve.sh [port]                      # lancer l'interface
+```
+
+- Un projet est identifié par son dossier : déjà inscrit, il garde son nom ; un nom pris par un autre dossier est refusé. Noms autorisés : lettres, chiffres, `.`, `_`, `-`.
+- `feature-serve` inscrit au passage le projet courant (nom = dossier du repo) s'il a des features.
+- Un projet inscrit pendant que le serveur tourne n'est rafraîchi en direct qu'après redémarrage de `feature-serve`.
+- `FEATURES_HUB_DIR` change l'emplacement du hub (tests).
+- Pages de suivi générées à chaque rechargement par `templates/feature-web/kanban_hook.py` : **Tableau de bord** (accueil), **En ce moment** (en cours, bloqué, attend votre Go), et un **Kanban** en tête de chaque onglet projet. Elles lisent `meta.json` et `tasks/tasks.json`, sans rien écrire dans les projets.
+- Les projets initialisés avant le hub gardent `.claude/features-web/` et `.claude/features/assets/` : inutiles, supprimables à la main.
+
+### `feature-tasks.py`
+
+Tient à jour `tasks/tasks.json`, la source du kanban. Le pipeline `/feature` l'appelle ; à la main :
+
+```bash
+F=<projet>/.claude/features/<slug>
+~/.claude/bin/feature-tasks.py import "$F" [--force]       # tableau résumé de tasks.md → tasks.json
+~/.claude/bin/feature-tasks.py set "$F" <ID> <todo|doing|blocked|done> [--note "..."] [--go|--no-go]
+~/.claude/bin/feature-tasks.py waiting "$F" [texte]        # ce qu'on attend de vous (vide : efface)
+~/.claude/bin/feature-tasks.py show "$F"
+```
+
+`import` reconnaît les colonnes par leur en-tête (ID, Titre, Statut, Type, Lot/Phase, Pts, Deps), traduit les statuts libres (`done (…)`, `in-progress`, `bloqué`, `reportée`…) et signale ceux qu'il ne comprend pas. Si l'implémentation est terminée, les tasks restées ouvertes passent en `done` avec la note « déduit ».
+
+### `feature-promote.sh` et `feature-archive.sh` — versionnement des artéfacts
+
+Les artéfacts bruts restent dans `.claude/features/` (non versionné). Deux sorties, à activer **par projet** (désactivées par défaut) :
+
+| Option | Ce qui est versionné | Où |
+|---|---|---|
+| `promote` | la doc, la spec et le plan finaux de chaque feature | `docs/features/<slug>/` du repo projet |
+| `archive` | tous les artéfacts de toutes les features | repo privé central, un dossier par projet |
+
+```bash
+~/.claude/bin/feature-hub.sh options                         # état des options
+~/.claude/bin/feature-hub.sh option <projet> promote on      # ou archive on / off
+~/.claude/bin/feature-promote.sh <projet>/.claude/features/<slug> [--force]
+~/.claude/bin/feature-archive.sh init                        # une fois : ~/.claude/features-archive
+~/.claude/bin/feature-archive.sh sync [projet]              # copie + git add (tous les projets autorisés, ou un seul)
+~/.claude/bin/feature-archive.sh status                      # ce qui serait commité (lecture seule)
+~/.claude/bin/feature-archive.sh commit                      # gitleaks puis commit local ; push manuel ensuite
+```
+
+- `feature-promote.sh` ne remplace un fichier déjà promu qui diffère qu'avec `--force`, signale les liens relatifs qui ne suivront pas, et ne commite rien. Un brouillon d'ADR se formalise avec `/adr` dans `docs/adr/`.
+- `feature-archive.sh` ne contacte jamais le réseau : premier envoi avec `git -C ~/.claude/features-archive push -u origin main` (si le repo GitHub n'est pas vide : `pull origin main --allow-unrelated-histories` avant).
+- Un projet client ne doit être mis en `archive on` qu'avec l'accord de son propriétaire : l'archive est un repo personnel. Vérifier que le repo distant est **privé** avant le premier push.
+- Un projet passé en `archive off` (ou désinscrit) n'est plus copié, mais son dossier reste dans l'archive : `sync` le signale avec la commande pour le retirer (`git rm -r`). Rien n'est supprimé automatiquement.
+- `commit` refuse de commiter si gitleaks trouve un secret dans les fichiers synchronisés.
 
 ### `install.sh` (à la racine du framework)
 
-Setup des symlinks `~/.claude/` → framework (à lancer une fois sur nouvelle machine).
+Setup des symlinks `~/.claude/` → framework, génération de `settings.json`, puis installation du groupe de prérequis `agentic` (mkdocs pour `/feature-serve`). À lancer sur nouvelle machine et après chaque `git pull` du framework.
 
 ```bash
 cd /[path-folder-projects]/claude-framework
-./install.sh [--dry-run] [--force]
+./install.sh [--dry-run] [--force] [--no-prereqs]
 ```
 
 ---
@@ -125,6 +184,8 @@ cd /[path-folder-projects]/claude-framework
 | `.pre-commit-config.yaml` | Hooks multi-langages (terraform/tfsec/checkov, prettier, eslint, php-cs-fixer, phpstan, sqlfluff, hadolint, shellcheck, gitleaks, detect-secrets…) |
 | `.yamllint` | Config yamllint stricte |
 | `CLAUDE.md.template` | Template `CLAUDE.md` projet (à remplir) |
+| `charte-redaction.md` | Charte d'écriture lisible (« En bref », détail replié, glossaire) appliquée par les agents, `/adr` et `/feature` aux nouveaux documents |
+| `feature-web/` | Hub web `/feature-serve` : modèle `mkdocs.yml`, hook `kanban_hook.py`, `extra.css` |
 
 ---
 
@@ -178,6 +239,13 @@ cd /[path-folder-projects]/claude-framework
 |---|---|---|
 | `sqlfluff` | pipx | Linter/formatter SQL multi-dialect |
 
+### Groupe `agentic` (installé aussi par `install.sh`)
+| Outil | Source | Rôle |
+|---|---|---|
+| `mkdocs` (`<2`) | pipx | Moteur de l'interface web `/feature-serve`. Version < 2 : la 2.0 supprime les plugins |
+| `mkdocs-material` | pipx inject | Thème de l'interface |
+| `mkdocs-awesome-pages-plugin` | pipx inject | Navigation auto des artéfacts de feature |
+
 ---
 
 ## Fichiers globaux
@@ -191,8 +259,11 @@ Workflow GitFlow détaillé (branches, tags, cycles feature/release/hotfix).
 ### `~/.claude/CODING_STANDARDS.md` → `framework/CODING_STANDARDS.md`
 Normes de code par langage : Terraform, Ansible, Python, JS/TS, PHP, SQL, NoSQL, Docker, Bash, Markdown.
 
-### `~/.claude/settings.json` → `framework/settings.json`
-Permissions Claude Code (allowlist/denylist) + déclaration des hooks.
+### `~/.claude/RTK.md` → `framework/RTK.md`
+Usage de RTK (proxy CLI de compression des sorties, branché en hook `PreToolUse`). La politique de compression sélective — quelles commandes, pourquoi, comment mesurer — est dans [Politique RTK](rtk-policy.md).
+
+### `~/.claude/settings.json` ⇐ `framework/settings.json` + `~/.claude/settings.overlay.json`
+Fichier **généré** par `install.sh` (pas un symlink). Base versionnée : permissions (allowlist/denylist) + déclaration des hooks. Overlay local non versionné : config perso/client, notamment `autoMode`. Détails : [02 — Architecture](02-architecture.md#settingsjson--base-versionnée--overlay-local).
 
 ---
 

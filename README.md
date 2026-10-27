@@ -17,6 +17,7 @@ Conçu pour être **réutilisable sur tous les projets** via symlinks depuis `~/
 | [05 — Cas d'usage end-to-end](docs/05-use-cases.md) | **7 scénarios concrets** : bootstrap, feature, hotfix, reprise, ADR, debug, audit sécu |
 | [06 — Référence](docs/06-reference.md) | Pour trouver rapidement une commande / skill / agent / outil |
 | [07 — Cookbook](docs/07-cookbook.md) | Recettes pratiques + troubleshooting |
+| [Politique RTK](docs/rtk-policy.md) | Avant d'activer/désactiver la compression RTK sur une commande : mesures, exclusions, limites connues |
 
 **Première lecture recommandée** : [01 Vue d'ensemble](docs/01-overview.md) → [05 Cas d'usage](docs/05-use-cases.md) (le reste en référence).
 
@@ -29,6 +30,7 @@ claude-framework/
 ├── CLAUDE.md                   # Instructions globales Claude (workflow, sécurité, règles transverses)
 ├── GITFLOW.md                  # Workflow GitFlow standardisé (cheatsheet danielkummer)
 ├── CODING_STANDARDS.md         # Normes de code par langage
+├── RTK.md                      # Usage de RTK (proxy CLI de compression) — politique dans docs/rtk-policy.md
 ├── settings.json               # Config Claude Code (permissions, hooks)
 ├── skills/                     # Compétences activables à la demande (25 skills)
 │   ├── architect/              # Solution Architect
@@ -86,7 +88,8 @@ cd /[path-folder-projects]claude-framework
 Le script :
 - Sauvegarde l'éventuel `~/.claude/` existant (dans `~/.claude.bak-YYYYMMDD/`)
 - Crée les symlinks de `~/.claude/<item>` vers `<framework>/<item>` pour :
-  `CLAUDE.md`, `GITFLOW.md`, `CODING_STANDARDS.md`, `settings.json`, `skills/`, `agents/`, `hooks/`, `templates/`, `bin/`
+  `CLAUDE.md`, `RTK.md`, `GITFLOW.md`, `CODING_STANDARDS.md`, `skills/`, `commands/`, `agents/`, `hooks/`, `templates/`, `bin/`, `docs/`
+- **Génère** `~/.claude/settings.json` (fichier réel, pas un symlink) = `settings.json` du repo fusionné avec l'overlay local non versionné `~/.claude/settings.overlay.json` (voir [02 — Architecture](docs/02-architecture.md#settingsjson--base-versionnée--overlay-local)). À relancer après toute modif de l'un des deux.
 - Crée les dossiers runtime locaux si absents : `projects/`, `sessions/`, etc. (géré par Claude Code)
 
 ### 3. Installer les outils prérequis

@@ -1,0 +1,66 @@
+/* Status badges pour les phases */
+.phase-done { color: #2e7d32; font-weight: bold; }
+.phase-active { color: #1565c0; font-weight: bold; }
+.phase-pending { color: #757575; }
+
+/* Améliore la lisibilité des tableaux de tasks */
+.md-typeset table:not([class]) th {
+  background-color: var(--md-primary-fg-color);
+  color: white;
+}
+
+/* Highlight bloquants dans les reviews */
+.md-typeset .admonition.danger {
+  border-left-color: #b71c1c;
+}
+
+/* Suivi : barre d'avancement */
+.fh-bar {
+  display: inline-block;
+  width: 6em;
+  height: 0.6em;
+  border-radius: 0.3em;
+  background: var(--md-default-fg-color--lightest);
+  vertical-align: middle;
+  overflow: hidden;
+}
+.fh-bar > span { display: block; height: 100%; background: #2e7d32; }
+
+/* Kanban : 4 colonnes, une seule sur mobile */
+.fh-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8em;
+  margin: 0.8em 0 1.6em;
+  align-items: start;
+}
+@media (max-width: 900px) { .fh-board { grid-template-columns: 1fr; } }
+.fh-col {
+  background: var(--md-code-bg-color);
+  border-radius: 0.4em;
+  padding: 0.5em;
+  border-top: 0.25em solid #757575;
+}
+.fh-doing { border-top-color: #1565c0; }
+.fh-blocked { border-top-color: #b71c1c; }
+.fh-done { border-top-color: #2e7d32; }
+.fh-col-title { font-weight: bold; margin-bottom: 0.4em; }
+.fh-col-title span { opacity: 0.6; font-weight: normal; }
+.fh-card {
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.3em;
+  padding: 0.4em 0.5em;
+  margin-bottom: 0.4em;
+  font-size: 0.85em;
+  line-height: 1.35;
+}
+.fh-id { font-size: 0.85em; opacity: 0.7; }
+.fh-note { font-size: 0.9em; opacity: 0.8; margin-top: 0.2em; }
+.fh-go {
+  background: #ef6c00;
+  color: #fff;
+  border-radius: 0.2em;
+  padding: 0 0.3em;
+  font-size: 0.9em;
+}

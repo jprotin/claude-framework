@@ -15,3 +15,6 @@
 
 # Config locale d'install (crée par install.sh, ne doit pas être commitée si contient des paths spécifiques)
 .install.local
+
+# Skills du compte claude.ai synchronisées par Claude Code (runtime, via le symlink ~/.claude/skills)
+skills/synced/

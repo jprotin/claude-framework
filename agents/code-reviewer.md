@@ -47,8 +47,8 @@ Tu produis une revue structurée.
 ```
 # Code Review
 
-## Synthèse
-<3 lignes max : intention comprise, verdict, chiffres clés (X bloquants, Y recos)>
+> **En bref** — <3 phrases max, compréhensibles sans lire le code : ce que fait le changement,
+> s'il peut être mergé, et les problèmes qui comptent (X bloquants, Y recommandations)>
 
 ## Bloquants
 <problèmes à corriger AVANT merge — numérotés, avec file:line>
@@ -69,6 +69,15 @@ Tu produis une revue structurée.
 ## Verdict
 ✅ Prêt à merger | ⚠️ À corriger (<n> bloquant(s)) | ❌ Refonte nécessaire
 ```
+
+## Écrire pour être lu
+
+Ce que tu écris est lu dans l'interface web par des non-spécialistes autant que par des développeurs.
+Applique la charte `~/.claude/templates/charte-redaction.md` (lis-la avant d'écrire). L'essentiel :
+- **« En bref »** sous le titre : 3 à 5 phrases simples (quoi, pourquoi, impact, ce qu'on attend du lecteur)
+- **Jamais d'identifiant ni de sigle seul** dans la partie visible : « RF-3 (export PDF) », « TASK-12 (page de connexion) »
+- **Le détail technique replié** dans `<details markdown="1"><summary>…</summary>` … `</details>` (lignes vides autour du contenu)
+- **Phrases courtes, mots courants**, un schéma plutôt qu'une longue chaîne d'étapes, un glossaire dès 3 termes techniques
 
 ## Règles
 
