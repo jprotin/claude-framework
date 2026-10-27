@@ -23,12 +23,23 @@ Génère un ADR dans `docs/adr/` selon le format léger Michael Nygard + ajouts.
 - **Auteur(s)** : <nom>
 - **Tags** : <architecture, sécurité, perf, etc.>
 
+> **En bref** — <3 à 5 phrases simples : la question posée, la décision prise, pourquoi, et ce
+> que ça change concrètement (pour l'équipe, les utilisateurs, les coûts)>
+
 ## Contexte
 
 <2-4 paragraphes : quel problème, quelles forces en présence, quelles contraintes.
 Factuel. Pas de jugement. Un lecteur 2 ans plus tard doit comprendre *pourquoi* on s'est posé la question.>
 
 ## Options envisagées
+
+| Option | En une phrase | Principal avantage | Principal inconvénient |
+|---|---|---|---|
+| 1. <nom> | ... | ... | ... |
+| 2. <nom> | ... | ... | ... |
+
+<details markdown="1">
+<summary>Détail des options</summary>
 
 ### Option 1 : <nom>
 - **Description** : …
@@ -41,6 +52,8 @@ Factuel. Pas de jugement. Un lecteur 2 ans plus tard doit comprendre *pourquoi* 
 
 ### Option 3 : <nom>
 - …
+
+</details>
 
 ## Décision
 
@@ -56,6 +69,9 @@ Factuel. Pas de jugement. Un lecteur 2 ans plus tard doit comprendre *pourquoi* 
 
 ### Neutres / À surveiller
 - …
+
+## Ce que ça change
+<2 à 4 puces en mots simples : ce qui change pour qui, à partir de quand>
 
 ## Alternatives non explorées (et pourquoi)
 
@@ -87,6 +103,14 @@ Factuel. Pas de jugement. Un lecteur 2 ans plus tard doit comprendre *pourquoi* 
 4. Proposer d'ajouter au `README.md` racine une référence vers cet ADR si décision structurante
 
 5. Ne pas commit — laisser l'utilisateur valider
+
+## Écrire pour être lu
+
+Un ADR est relu des mois plus tard, souvent par quelqu'un qui n'était pas là. Applique la charte
+`~/.claude/templates/charte-redaction.md` : « En bref » compréhensible seul, aucun sigle sans sa
+forme longue, options comparées dans le tableau court, détail replié, glossaire dès 3 termes
+techniques. Le format (`<details markdown="1">`) s'affiche aussi bien sur GitHub / Azure DevOps
+que dans MkDocs.
 
 ## Règles
 

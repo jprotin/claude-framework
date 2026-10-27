@@ -74,7 +74,10 @@ Hiérarchiser par **(probabilité × impact)** :
 ## Format de plan
 
 ```
-# Test Plan — <fonction / module>
+# <Feature ou module, en mots> : la stratégie de tests
+
+> **En bref** — <2 à 4 phrases : ce qu'on vérifie et pourquoi, les risques couverts, ce qui
+> n'est volontairement pas testé>
 
 ## Contexte
 - **Scope** : <file(s) / fonction(s)>
@@ -133,6 +136,15 @@ Hiérarchiser par **(probabilité × impact)** :
 - Integration : parcours critiques
 - Total lignes : > 75%
 ```
+
+## Écrire pour être lu
+
+Ce que tu écris est lu dans l'interface web par des non-spécialistes autant que par des développeurs.
+Applique la charte `~/.claude/templates/charte-redaction.md` (lis-la avant d'écrire). L'essentiel :
+- **« En bref »** sous le titre : 3 à 5 phrases simples (quoi, pourquoi, impact, ce qu'on attend du lecteur)
+- **Jamais d'identifiant ni de sigle seul** dans la partie visible : « RF-3 (export PDF) », « TASK-12 (page de connexion) »
+- **Le détail technique replié** dans `<details markdown="1"><summary>…</summary>` … `</details>` (lignes vides autour du contenu)
+- **Phrases courtes, mots courants**, un schéma plutôt qu'une longue chaîne d'étapes, un glossaire dès 3 termes techniques
 
 ## Règles
 

@@ -37,6 +37,10 @@ Ce script crée l'arborescence `.claude/features/<slug>/` et le fichier `meta.js
 
 Confirmer à l'utilisateur : « Feature `<slug>` initialisée. Phase 1 — Spec en cours... »
 
+### Rédaction lisible (toutes phases)
+
+Tout document écrit dans `.claude/features/<slug>/` suit la charte `~/.claude/templates/charte-redaction.md` : « En bref » en tête, mots courants, aucun identifiant seul dans la partie visible, détail technique replié. Les agents du framework l'appliquent d'eux-mêmes ; l'agent `Plan` (intégré) et les synthèses rédigées ici doivent la recevoir explicitement dans leur brief. Les résumés affichés à l'utilisateur aux gates suivent les mêmes règles.
+
 ### Suivi dans l'interface web (toutes phases)
 
 Le tableau de bord et les kanbans du hub (`feature-serve`) lisent `meta.json` et `tasks/tasks.json`.
@@ -129,7 +133,7 @@ Attendre la notification de fin du Workflow. Puis afficher le rapport final (voi
 Exécuter chaque phase séquentiellement avec gate utilisateur après chaque phase.
 
 **Phase 2 — PLAN**
-1. Lancer agent `Plan` avec : spec-final + contexte projet
+1. Lancer agent `Plan` avec : spec-final + contexte projet + consigne de rédaction (charte : titre en mots, « En bref », « Les étapes », un H2 par composant, détail technique replié)
    - Output : `plan/plan.md`
 2. Lancer agent `challenger` (type: plan) sur `plan/plan.md`
    - Output : `plan/plan-challenge.md`
@@ -170,7 +174,7 @@ En mode interactif : gate après chaque block de tasks (pas chaque task individu
 5. Gate (interactif) ou rapport final (auto)
 
 **Phase 6 — DOCUMENTATION**
-1. Rédiger `docs/feature-doc.md` depuis tous les artéfacts produits
+1. Rédiger `docs/feature-doc.md` depuis tous les artéfacts produits, pour toute personne qui découvre la feature : « En bref », ce que ça change et comment s'en servir, points d'attention, détails techniques repliés
 2. Proposer l'entrée CHANGELOG
 3. Mettre à jour `meta.json` : `"status": "done"`
 

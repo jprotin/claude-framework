@@ -67,31 +67,38 @@ Pour chaque flux principal, écrire 1-3 critères **Given / When / Then** (forma
 
 #### `analysis.md` — document principal
 
-```markdown
-# Spec — <feature-slug>
+````markdown
+# <Nom de la feature, en mots> : la spec
 
-## Résumé
-<2-3 phrases : quoi, pour qui, pourquoi>
+> **En bref** — <3 à 5 phrases simples : ce que la feature apporte, à qui, pourquoi maintenant,
+> et ce qu'on attend du lecteur (valider, trancher une question, rien).
 
-## Contexte
-<état actuel du système, pourquoi cette feature maintenant>
+## Pourquoi
+<état actuel et problème rencontré, en langage courant — 1 à 2 paragraphes>
 
-## Acteurs
-| Acteur | Rôle dans cette feature |
+## Qui est concerné
+| Qui | Ce que ça change pour lui |
 |---|---|
 | ... | ... |
 
-## Exigences fonctionnelles
+## Ce que la feature doit faire
 
-### RF-1 — <titre>
-**Description** : <ce que le système doit faire>
-**Priorité** : Must / Should / Could
-**Critères d'acceptance** :
+### RF-1 — <titre en mots>
+<ce que le système doit faire, en une ou deux phrases compréhensibles sans contexte>
+**Priorité** : indispensable / souhaitable / bonus
+**On saura que c'est fait quand** :
 - Given <état initial> When <action> Then <résultat attendu>
 
 ### RF-2 — ...
 
-## Exigences non-fonctionnelles
+## Ce que la feature ne fait pas
+- <hors-scope, en mots>
+
+## Questions à trancher
+1. <question, avec ce qui en dépend>
+
+<details markdown="1">
+<summary>Détails techniques : exigences non fonctionnelles, contraintes, dépendances, risques</summary>
 
 ### RNF-1 — Performance
 ...
@@ -99,41 +106,29 @@ Pour chaque flux principal, écrire 1-3 critères **Given / When / Then** (forma
 ### RNF-2 — Sécurité
 ...
 
-## Contraintes
-- <contrainte 1>
-- <contrainte 2>
+### Contraintes
+- <contrainte>
 
-## Hors-scope
-- <ce qui n'est PAS dans cette feature>
-
-## Dépendances
+### Dépendances
 | Module / Service | Nature de la dépendance |
 |---|---|
 | ... | ... |
 
-## Risques identifiés à ce stade
+### Risques identifiés à ce stade
 | Risque | Probabilité | Impact | Mitigation |
 |---|---|---|---|
 | ... | ... | ... | ... |
 
-## Questions ouvertes
-1. <question qui bloque ou conditionne la spec>
-```
+</details>
+
+## Glossaire
+- **<terme>** : <définition en une phrase> (dès 3 termes techniques)
+````
 
 #### `adr-draft.md` — si décision architecturale détectée
 
-Format ADR standard (Nygard) :
-```markdown
-# ADR-XXX — <titre>
-
-**Date** : <date>
-**Statut** : Draft
-
-## Contexte
-## Décision
-## Alternatives considérées
-## Conséquences
-```
+Format du skill `/adr` (voir `~/.claude/skills/adr/SKILL.md`), avec **Statut : Draft** :
+« En bref » en tête, options comparées dans un tableau court, détail replié.
 
 Si aucune décision architecturale, ne pas créer ce fichier.
 
@@ -155,11 +150,21 @@ Si aucune décision architecturale, ne pas créer ce fichier.
 - [Documentation](docs/feature-doc.md) *(à venir)*
 ```
 
+## Écrire pour être lu
+
+Ce que tu écris est lu dans l'interface web par des non-spécialistes autant que par des développeurs.
+Applique la charte `~/.claude/templates/charte-redaction.md` (lis-la avant d'écrire). L'essentiel :
+- **« En bref »** sous le titre : 3 à 5 phrases simples (quoi, pourquoi, impact, ce qu'on attend du lecteur)
+- **Jamais d'identifiant ni de sigle seul** dans la partie visible : « RF-3 (export PDF) », « TASK-12 (page de connexion) »
+- **Le détail technique replié** dans `<details markdown="1"><summary>…</summary>` … `</details>` (lignes vides autour du contenu)
+- **Phrases courtes, mots courants**, un schéma plutôt qu'une longue chaîne d'étapes, un glossaire dès 3 termes techniques
+
 ## Règles
 
 - **Basé sur l'observé** : ne pas inventer de contraintes, les déduire du code/config existant
 - **Précis sur les RF** : chaque exigence a un critère d'acceptance testable
 - **Honnête sur les inconnues** : les questions ouvertes valent mieux que des hypothèses masquées
 - **Pas d'implémentation** : la spec décrit le QUOI, pas le COMMENT
-- **Longueur** : `analysis.md` doit tenir en 2-4 pages — synthèse, pas roman
+- **Longueur** : partie visible de `analysis.md` sur un ou deux écrans ; 2-4 pages au total, détails compris
+- **Lisible** : charte `~/.claude/templates/charte-redaction.md` (voir ci-dessous)
 - **Markdown propre** : titres cohérents, tableaux alignés, listes parallèles
