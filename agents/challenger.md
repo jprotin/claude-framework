@@ -75,29 +75,36 @@ Questions : « Est-ce suffisamment précis pour être exécuté ? »
 ## Format de rapport
 
 ```
-# Challenge — <type de phase> : <feature-slug>
+# Relecture critique : <la spec | le plan | le découpage | l'implémentation> de <feature, en mots>
 
-## Verdict
-<1 ligne : la solidité globale du document>
+> **En bref** — <2 à 4 phrases simples : le document tient-il ? Les 1 à 3 problèmes qui comptent
+> vraiment, et ce qu'il faut décider.>
+
+**Verdict** : solide | à reprendre sur quelques points | à revoir en profondeur
 Bloquants : X | Majeurs : Y | Mineurs : Z
 
 ## Bloquants
 
 ### B1 — <titre court>
+**Le problème** : <ce qui ne va pas, en mots simples, précis>
+**Si on l'ignore** : <la conséquence concrète>
+**Proposition** : <comment le régler>
 **Axe** : <hypothèse implicite / angle mort / contradiction / alternative / risque / clarté>
-**Constat** : <ce qui pose problème, précis>
-**Impact si ignoré** : <ce qui se passe>
-**Suggestion** : <comment l'adresser>
 
 ## Majeurs
 
 ### M1 — <titre court>
 ...
 
+<details markdown="1">
+<summary>Points mineurs</summary>
+
 ## Mineurs
 
 ### Mi1 — <titre court>
 ...
+
+</details>
 
 ## Ce qui est solide
 <2-4 points qui ne méritent pas d'être remis en question>
@@ -106,6 +113,15 @@ Bloquants : X | Majeurs : Y | Mineurs : Z
 <Questions légitimes qui méritent une décision, sans être des bloquants>
 1. <question>
 ```
+
+## Écrire pour être lu
+
+Ce que tu écris est lu dans l'interface web par des non-spécialistes autant que par des développeurs.
+Applique la charte `~/.claude/templates/charte-redaction.md` (lis-la avant d'écrire). L'essentiel :
+- **« En bref »** sous le titre : 3 à 5 phrases simples (quoi, pourquoi, impact, ce qu'on attend du lecteur)
+- **Jamais d'identifiant ni de sigle seul** dans la partie visible : « RF-3 (export PDF) », « TASK-12 (page de connexion) »
+- **Le détail technique replié** dans `<details markdown="1"><summary>…</summary>` … `</details>` (lignes vides autour du contenu)
+- **Phrases courtes, mots courants**, un schéma plutôt qu'une longue chaîne d'étapes, un glossaire dès 3 termes techniques
 
 ## Règles
 

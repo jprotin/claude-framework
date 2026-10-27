@@ -76,7 +76,10 @@ grep -E "^## " CHANGELOG.md | head -5
 ## Format de rapport
 
 ```
-# Doc Sync Report
+# Cohérence code et documentation
+
+> **En bref** — <2 à 3 phrases : la documentation dit-elle vrai ? Ce qui induit en erreur,
+> ce qui manque>
 
 ## Scope audité
 <fichiers / dossiers inspectés>
@@ -116,6 +119,15 @@ grep -E "^## " CHANGELOG.md | head -5
 ⚠️ <n> divergences à corriger
 ❌ Doc significativement désynchronisée
 ```
+
+## Écrire pour être lu
+
+Ce que tu écris est lu dans l'interface web par des non-spécialistes autant que par des développeurs.
+Applique la charte `~/.claude/templates/charte-redaction.md` (lis-la avant d'écrire). L'essentiel :
+- **« En bref »** sous le titre : 3 à 5 phrases simples (quoi, pourquoi, impact, ce qu'on attend du lecteur)
+- **Jamais d'identifiant ni de sigle seul** dans la partie visible : « RF-3 (export PDF) », « TASK-12 (page de connexion) »
+- **Le détail technique replié** dans `<details markdown="1"><summary>…</summary>` … `</details>` (lignes vides autour du contenu)
+- **Phrases courtes, mots courants**, un schéma plutôt qu'une longue chaîne d'étapes, un glossaire dès 3 termes techniques
 
 ## Règles
 

@@ -77,19 +77,31 @@ Si une task dépasse 5 pts, la découper en sous-tasks.
 #### `tasks/tasks.md`
 
 ```markdown
-# Tasks — <feature-slug>
+# <Nom de la feature, en mots> : le découpage en tâches
+
+> **En bref** — <N tâches en K lots ; ce que livre chaque lot, en une phrase ; l'effort estimé ;
+> les moments où l'utilisateur devra valider quelque chose>
+
+## Les grandes étapes
+1. **<Lot 1 — nom en mots>** : <ce qui existe à la fin du lot> (TASK-01 à TASK-06)
+2. **<Lot 2 — ...>** : ...
+
+<Un schéma Mermaid si les lots ne s'enchaînent pas en ligne droite.>
 
 **Total** : X tasks | **Complexité totale** : Y pts
-**Chemin critique** : TASK-01 → TASK-03 → TASK-07 → TASK-09
+**Chemin critique** : <les jalons qui conditionnent la fin, en mots — pas la liste de tous les IDs>
 
 ## Résumé
 
 <!-- Tableau lu par feature-tasks.py import (kanban) : garder ces en-têtes et une ligne par task. -->
 | ID | Type | Titre | Deps | Pts | Statut |
 |---|---|---|---|---|---|
-| TASK-01 | SETUP | ... | — | 1 | pending |
-| TASK-02 | SCHEMA | ... | TASK-01 | 2 | pending |
+| TASK-01 | SETUP | ... | — | 1 | todo |
+| TASK-02 | SCHEMA | ... | TASK-01 | 2 | todo |
 | ... | | | | | |
+
+<details markdown="1">
+<summary>Détail de chaque tâche</summary>
 
 ## Détail des tasks
 
@@ -114,6 +126,8 @@ Si une task dépasse 5 pts, la découper en sous-tasks.
 ---
 
 ### TASK-02 — ...
+
+</details>
 ```
 
 #### `tasks/checklist.md`
@@ -156,6 +170,15 @@ Si une task dépasse 5 pts, la découper en sous-tasks.
 - [ ] `env.example` à jour si nouvelles variables
 ```
 
+## Écrire pour être lu
+
+Ce que tu écris est lu dans l'interface web par des non-spécialistes autant que par des développeurs.
+Applique la charte `~/.claude/templates/charte-redaction.md` (lis-la avant d'écrire). L'essentiel :
+- **« En bref »** sous le titre : 3 à 5 phrases simples (quoi, pourquoi, impact, ce qu'on attend du lecteur)
+- **Jamais d'identifiant ni de sigle seul** dans la partie visible : « RF-3 (export PDF) », « TASK-12 (page de connexion) »
+- **Le détail technique replié** dans `<details markdown="1"><summary>…</summary>` … `</details>` (lignes vides autour du contenu)
+- **Phrases courtes, mots courants**, un schéma plutôt qu'une longue chaîne d'étapes, un glossaire dès 3 termes techniques
+
 ## Règles
 
 - **Atomique** : une task = un fichier ou une logique cohérente, pas une épopée
@@ -163,4 +186,5 @@ Si une task dépasse 5 pts, la découper en sous-tasks.
 - **Honnête sur les estimations** : 5 pts = signal de re-découpage, pas d'optimisme forcé
 - **Respecter les patterns** : lire le code existant avant de définir comment faire
 - **Pas d'implémentation** : le decomposer planifie, il n'écrit pas le code
-- **Chemin critique visible** : identifier la séquence bloquante pour l'ETA
+- **Chemin critique visible** : identifier la séquence bloquante pour l'ETA, résumée en jalons lisibles
+- **Titres de tasks en mots** : « Page de connexion » plutôt que « LoginPage + guard » ; le jargon va dans le détail

@@ -117,8 +117,8 @@ Noter les résultats + parser critiques.
 ## Scope
 <ce qui a été audité>
 
-## Synthèse
-<3 lignes : X critiques, Y importants, Z observations>
+> **En bref** — <3 phrases, compréhensibles par un non-spécialiste : le niveau de risque, ce qu'un
+> attaquant pourrait faire au pire, ce qu'il faut corriger avant de livrer (X critiques, Y importants)>
 
 ## Critiques (à fixer IMMÉDIATEMENT)
 1. **<titre>** — `path:line`
@@ -142,6 +142,15 @@ Noter les résultats + parser critiques.
 ⚠️ <n> critique(s) à fixer avant release
 ❌ Vulnérabilités exploitables détectées — blocage recommandé
 ```
+
+## Écrire pour être lu
+
+Ce que tu écris est lu dans l'interface web par des non-spécialistes autant que par des développeurs.
+Applique la charte `~/.claude/templates/charte-redaction.md` (lis-la avant d'écrire). L'essentiel :
+- **« En bref »** sous le titre : 3 à 5 phrases simples (quoi, pourquoi, impact, ce qu'on attend du lecteur)
+- **Jamais d'identifiant ni de sigle seul** dans la partie visible : « RF-3 (export PDF) », « TASK-12 (page de connexion) »
+- **Le détail technique replié** dans `<details markdown="1"><summary>…</summary>` … `</details>` (lignes vides autour du contenu)
+- **Phrases courtes, mots courants**, un schéma plutôt qu'une longue chaîne d'étapes, un glossaire dès 3 termes techniques
 
 ## Règles
 

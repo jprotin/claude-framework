@@ -15,6 +15,11 @@ const { slug, featurePath, projectPath } = args
 
 const specPath = `${featurePath}/spec/analysis-final.md`
 
+// Chaque document est lu dans l'interface web par des non-spécialistes.
+const READABLE = `Rédaction : applique la charte ~/.claude/templates/charte-redaction.md (lis-la avant d'écrire) :
+« En bref » de 3 à 5 phrases simples sous le titre, aucun identifiant ni sigle seul dans la partie
+visible, détail technique replié dans <details markdown="1">, glossaire dès 3 termes techniques.`
+
 // ─── Phase 2 : PLAN ────────────────────────────────────────────────────────
 
 const [planResult, planChallenge] = await pipeline(
@@ -31,7 +36,10 @@ Règles :
 - Identifie les risques techniques
 - Estime la complexité globale (S/M/L/XL)
 - Écris le plan dans ${featurePath}/plan/plan.md
-- Format markdown strict, titres H2 par composant, H3 par décision technique`,
+- Structure : titre en mots, « En bref », « Les étapes » (liste numérotée ou schéma Mermaid),
+  puis un H2 par composant (H3 par décision technique), le détail technique replié
+
+${READABLE}`,
         {
           label: `plan:${slug}`,
           phase: 'Plan',
@@ -49,7 +57,7 @@ Type de phase : plan
 Feature slug : ${slug}
 
 Lis le plan et produis une critique structurée dans ${featurePath}/plan/plan-challenge.md.
-Utilise le format du challenger agent : Bloquants / Majeurs / Mineurs / Questions ouvertes.`,
+Utilise le format du challenger agent : En bref, Bloquants / Majeurs / Mineurs / Questions ouvertes.`,
       {
         label: `challenge-plan:${slug}`,
         phase: 'Plan',
@@ -206,10 +214,13 @@ Inputs :
 - Doc sync : ${featurePath}/validation/doc-sync.md
 
 Produis ${featurePath}/validation/final-report.md avec :
+- « En bref » : peut-on livrer ? ce qu'il reste à faire, en mots simples
 - Verdict global (prêt / corrections requises / refonte)
 - Points bloquants à traiter avant merge
 - Recommandations non bloquantes
-- Résumé des validations passées`,
+- Résumé des validations passées (détail replié)
+
+${READABLE}`,
   {
     label: `validation-report:${slug}`,
     phase: 'Validate',
@@ -228,12 +239,15 @@ Synthétise l'ensemble du travail produit :
 - Validation : ${featurePath}/validation/final-report.md
 
 Produis :
-1. ${featurePath}/docs/feature-doc.md — documentation complète de la feature :
-   - Ce que fait la feature (pour un développeur qui rejoint le projet)
-   - Architecture et décisions techniques
-   - Comment tester
-   - Points d'attention opérationnels
+1. ${featurePath}/docs/feature-doc.md — documentation de la feature, lisible par toute personne
+   qui la découvre (chef de projet, client, nouvel arrivant) :
+   - « En bref » : ce que fait la feature et pour qui
+   - Ce que ça change pour les utilisateurs, et comment s'en servir
+   - Points d'attention (limites connues, exploitation)
+   - Détails techniques repliés : architecture, décisions, comment tester
    - Liens vers les ADR si présents
+
+${READABLE}
 
 2. Propose une entrée CHANGELOG (format Keep a Changelog) dans ${featurePath}/docs/changelog-entry.md
 

@@ -50,31 +50,27 @@ EOF
 cat > "${FEATURE_DIR}/index.md" <<EOF
 # ${SLUG}
 
-**Projet** : ${PROJECT_NAME}
-**Mode** : ${MODE}
-**Phase courante** : Spec (Phase 1)
-**Démarré le** : $(date +"%d/%m/%Y")
+> **En bref** — Feature du projet ${PROJECT_NAME}, démarrée le $(date +"%d/%m/%Y") en mode ${MODE}.
+> L'avancement tâche par tâche est dans le [kanban du projet](../kanban.md).
 
-## Progression
+## Les étapes
 
-| Phase | Statut |
-|---|---|
-| 1 — Spec & ADR | En cours |
-| 2 — Plan | En attente |
-| 3 — Découpage + Tests | En attente |
-| 4 — Implémentation | En attente |
-| 5 — Validation | En attente |
-| 6 — Documentation | En attente |
+| Étape | Ce qu'on y produit | Statut |
+|---|---|---|
+| 1 — Cadrage | ce que la feature doit faire, et les décisions d'architecture | En cours |
+| 2 — Conception | comment on va la construire | À venir |
+| 3 — Découpage | la liste des tâches et la stratégie de tests | À venir |
+| 4 — Développement | le code, tâche par tâche | À venir |
+| 5 — Vérification | relecture du code, sécurité, documentation | À venir |
+| 6 — Documentation | la documentation finale de la feature | À venir |
 
-## Documents
+## Les documents
 
-- [Analyse & Spec](spec/analysis.md)
-- [Challenge de la spec](spec/analysis-challenge.md)
-- [Plan](plan/plan.md)
-- [Tasks](tasks/tasks.md)
-- [Stratégie de tests](tasks/test-strategy.md)
-- [Rapport de validation](validation/final-report.md)
-- [Documentation](docs/feature-doc.md)
+- [Ce que la feature doit faire (spec)](spec/analysis.md) et sa [relecture critique](spec/analysis-challenge.md)
+- [Comment on la construit (plan)](plan/plan.md)
+- [Les tâches](tasks/tasks.md) et la [stratégie de tests](tasks/test-strategy.md)
+- [Le rapport de vérification](validation/final-report.md)
+- [La documentation de la feature](docs/feature-doc.md)
 EOF
 
 # ── .pages pour navigation ordonnée ───────────────────────────────────────
@@ -83,50 +79,50 @@ cat > "${FEATURE_DIR}/.pages" <<EOF
 title: "${SLUG}"
 nav:
   - Vue d'ensemble: index.md
-  - Spec & ADR: spec
-  - Plan: plan
-  - Tasks: tasks
-  - Validation: validation
-  - Documentation: docs
+  - "1. Cadrage": spec
+  - "2. Conception": plan
+  - "3. Découpage": tasks
+  - "5. Vérification": validation
+  - "6. Documentation": docs
 EOF
 
 cat > "${FEATURE_DIR}/spec/.pages" <<EOF
-title: "Spec & ADR"
+title: "1. Cadrage"
 nav:
   - Analyse: analysis.md
-  - Challenge: analysis-challenge.md
-  - Final: analysis-final.md
-  - ADR: adr-draft.md
+  - Relecture critique: analysis-challenge.md
+  - Version finale: analysis-final.md
+  - "Décision d'architecture (ADR)": adr-draft.md
 EOF
 
 cat > "${FEATURE_DIR}/plan/.pages" <<EOF
-title: "Plan"
+title: "2. Conception"
 nav:
   - Plan: plan.md
-  - Challenge: plan-challenge.md
-  - Final: plan-final.md
+  - Relecture critique: plan-challenge.md
+  - Version finale: plan-final.md
 EOF
 
 cat > "${FEATURE_DIR}/tasks/.pages" <<EOF
-title: "Tasks"
+title: "3. Découpage"
 nav:
-  - Tasks: tasks.md
-  - Challenge: tasks-challenge.md
+  - Tâches: tasks.md
+  - Relecture critique: tasks-challenge.md
   - Stratégie de tests: test-strategy.md
-  - Checklist: checklist.md
+  - Checklist qualité: checklist.md
 EOF
 
 cat > "${FEATURE_DIR}/validation/.pages" <<EOF
-title: "Validation"
+title: "5. Vérification"
 nav:
   - Rapport final: final-report.md
   - Sécurité: security.md
-  - Code review: review.md
-  - Doc sync: doc-sync.md
+  - Relecture du code: review.md
+  - Cohérence de la doc: doc-sync.md
 EOF
 
 cat > "${FEATURE_DIR}/docs/.pages" <<EOF
-title: "Documentation"
+title: "6. Documentation"
 nav:
   - Documentation: feature-doc.md
   - Changelog: changelog-entry.md

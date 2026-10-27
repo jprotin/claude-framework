@@ -159,6 +159,8 @@ cd /[path-folder-projects]/claude-framework
 | `.pre-commit-config.yaml` | Hooks multi-langages (terraform/tfsec/checkov, prettier, eslint, php-cs-fixer, phpstan, sqlfluff, hadolint, shellcheck, gitleaks, detect-secrets…) |
 | `.yamllint` | Config yamllint stricte |
 | `CLAUDE.md.template` | Template `CLAUDE.md` projet (à remplir) |
+| `charte-redaction.md` | Charte d'écriture lisible (« En bref », détail replié, glossaire) appliquée par les agents, `/adr` et `/feature` aux nouveaux documents |
+| `feature-web/` | Hub web `/feature-serve` : modèle `mkdocs.yml`, hook `kanban_hook.py`, `extra.css` |
 
 ---
 
