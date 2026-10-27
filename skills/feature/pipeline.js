@@ -131,11 +131,15 @@ Stratégie de tests : ${featurePath}/tasks/test-strategy.md
 Spec : ${specPath}
 Plan : ${featurePath}/plan/plan.md
 
+Suivi (lu par le kanban de l'interface web) : si ${featurePath}/tasks/tasks.json n'existe pas,
+le créer d'abord avec : python3 ~/.claude/bin/feature-tasks.py import "${featurePath}"
+
 Procédure pour chaque task (dans l'ordre des dépendances) :
-1. Lire la task complète
+1. Lire la task complète, puis : python3 ~/.claude/bin/feature-tasks.py set "${featurePath}" <ID> doing
 2. Implémenter selon les fichiers concernés listés
 3. Vérifier le critère de done
-4. Mettre à jour le statut dans tasks.md (pending → done)
+4. python3 ~/.claude/bin/feature-tasks.py set "${featurePath}" <ID> done
+   (bloqué : set "${featurePath}" <ID> blocked --note "<raison en une phrase simple>")
 5. Si un test est requis pour cette task, l'écrire
 
 Respecter les patterns existants du projet à ${projectPath}.

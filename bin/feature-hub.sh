@@ -16,7 +16,7 @@
 #   registry.json   {"projects": {"<nom>": "<racine du projet>"}}  — seule donnée persistante
 #   mkdocs.yml      généré depuis templates/feature-web/mkdocs.yml.template
 #   docs/<nom>      lien vers <racine>/.claude/features (un onglet par projet)
-#   docs/index.md   page d'accueil générée
+#   pages de suivi  générées au build par templates/feature-web/kanban_hook.py
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -42,7 +42,7 @@ validate_name() {
   [[ "${name}" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] \
     || die "Nom de projet invalide : '${name}' (lettres, chiffres, . _ -)"
   case "${name}" in
-    assets|index.md|search|404.html|sitemap.xml|sitemap.xml.gz)
+    assets|index.md|en-cours.md|search|en-cours|404.html|sitemap.xml|sitemap.xml.gz)
       die "Nom de projet réservé : '${name}'" ;;
   esac
 }
@@ -117,40 +117,6 @@ active_projects() {
   done < <(cmd_list)
 }
 
-feature_line() {
-  local meta="$1" project="$2" slug status phase
-  slug="$(jq -r '.slug // empty' "${meta}")"
-  status="$(jq -r '.status // "inconnu"' "${meta}")"
-  phase="$(jq -r '.current_phase // "?"' "${meta}")"
-  [[ -n "${slug}" ]] || slug="$(basename "$(dirname "${meta}")")"
-  printf -- '- [%s](%s/%s/index.md) — statut : %s, phase %s/6\n' \
-    "${slug}" "${project}" "$(basename "$(dirname "${meta}")")" "${status}" "${phase}"
-}
-
-write_index() {
-  local projects="$1" name dir meta
-  {
-    echo "# Toutes les features"
-    echo
-    echo "Les features de tous les projets suivis par le pipeline \`/feature\`."
-    echo "Un onglet par projet en haut de page."
-    echo
-    while IFS=$'\t' read -r name dir; do
-      [[ -n "${name}" ]] || continue
-      echo "## ${name}"
-      echo
-      local found=0
-      for meta in "${dir}"/*/meta.json; do
-        [[ -f "${meta}" ]] || continue
-        found=1
-        feature_line "${meta}" "${name}"
-      done
-      [[ ${found} -eq 1 ]] || echo "_Aucune feature pour l'instant._"
-      echo
-    done <<< "${projects}"
-  } > "${DOCS_DIR}/index.md"
-}
-
 # Onglets : accueil d'abord, puis les projets sous leur nom exact
 # (awesome-pages réécrirait sinon « antares_ai » en « Antares ai »).
 write_nav() {
@@ -158,6 +124,7 @@ write_nav() {
   {
     echo "nav:"
     echo "  - index.md"
+    echo "  - en-cours.md"
     while IFS=$'\t' read -r name dir; do
       [[ -n "${name}" ]] || continue
       printf '  - "%s": "%s"\n' "${name}" "${name}"
@@ -184,12 +151,14 @@ cmd_build() {
   done < <(active_projects)
 
   cp "${FRAMEWORK_DIR}/templates/feature-web/extra.css" "${DOCS_DIR}/assets/extra.css"
-  write_index "${projects}"
+  # Accueil, « En ce moment » et kanbans : générés par le hook MkDocs (kanban_hook.py).
+  rm -f "${DOCS_DIR}/index.md"
   write_nav "${projects}"
 
   sed \
     -e "s|{{DOCS_PATH}}|${DOCS_DIR}|g" \
     -e "s|{{SITE_PATH}}|${HUB_DIR}/.site|g" \
+    -e "s|{{HOOKS_PATH}}|${FRAMEWORK_DIR}/templates/feature-web/kanban_hook.py|g" \
     "${FRAMEWORK_DIR}/templates/feature-web/mkdocs.yml.template" \
     > "${HUB_DIR}/mkdocs.yml"
 

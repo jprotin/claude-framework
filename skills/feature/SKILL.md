@@ -37,6 +37,21 @@ Ce script crée l'arborescence `.claude/features/<slug>/` et le fichier `meta.js
 
 Confirmer à l'utilisateur : « Feature `<slug>` initialisée. Phase 1 — Spec en cours... »
 
+### Suivi dans l'interface web (toutes phases)
+
+Le tableau de bord et les kanbans du hub (`feature-serve`) lisent `meta.json` et `tasks/tasks.json`.
+Les tenir à jour avec `~/.claude/bin/feature-tasks.py` (jamais à la main) :
+
+```bash
+F=<chemin-absolu>/.claude/features/<slug>
+python3 ~/.claude/bin/feature-tasks.py waiting "$F" "Valider la spec"   # à chaque gate, en clair
+python3 ~/.claude/bin/feature-tasks.py waiting "$F"                     # effacer une fois répondu
+python3 ~/.claude/bin/feature-tasks.py import "$F"                      # après la Phase 3
+python3 ~/.claude/bin/feature-tasks.py set "$F" <ID> doing|done|blocked [--note "..."] [--go]
+```
+
+`--go` signale une task qui attend le Go de l'utilisateur (commit, push, arbitrage). Un `set` sans `--go` retire ce signal, et sans `--note` il efface la note si le statut change.
+
 ### Étape 2 — Phase 1 : SPEC (toujours interactive)
 
 **Étape 2a — spec-writer**
@@ -129,15 +144,18 @@ Exécuter chaque phase séquentiellement avec gate utilisateur après chaque pha
 3. Lancer agent `challenger` (type: decompose) sur `tasks/tasks.md`
    - Output : `tasks/tasks-challenge.md`
 4. Gate : afficher synthèse + AskUserQuestion
+5. Après validation : `feature-tasks.py import "$F"` (crée `tasks/tasks.json` depuis le tableau résumé)
 
 **Phase 4 — IMPLÉMENTATION** (par task)
 
-Pour chaque task dans `tasks/tasks.md` (statut `pending`) :
-1. Afficher : « Implémentation TASK-XX — <titre> »
+Les statuts font foi dans `tasks/tasks.json` (`tasks.md` n'est plus mis à jour). Si ce fichier est absent (feature commencée avant le kanban) : `feature-tasks.py import "$F"` d'abord.
+
+Pour chaque task `todo` ou `doing` de `feature-tasks.py show "$F"`, dans l'ordre des dépendances de `tasks.md` :
+1. Afficher : « Implémentation TASK-XX — <titre> » et `feature-tasks.py set "$F" TASK-XX doing`
 2. Implémenter selon les instructions de la task
 3. Lancer agent `code-reviewer` sur le diff de cette task
 4. Si bloquants : corriger avant de passer à la suivante
-5. Mettre à jour le statut de la task dans `tasks/tasks.md`
+5. `feature-tasks.py set "$F" TASK-XX done` (ou `blocked --note "<raison simple>"`, ou `doing --go --note "Go commit"` si elle attend l'utilisateur)
 
 En mode interactif : gate après chaque block de tasks (pas chaque task individuelle).
 
@@ -192,7 +210,8 @@ Interface web : http://localhost:8888/<projet>/<feature-slug>/
 
 - **Phase 1 toujours interactive** — sans exception
 - **Ne jamais commiter** — le pipeline prépare, l'utilisateur valide et commite
-- **Mettre à jour meta.json** après chaque phase (permet de reprendre)
+- **Mettre à jour meta.json** après chaque phase (permet de reprendre), et `waiting_for` à chaque gate
+- **Statuts des tasks** : uniquement via `feature-tasks.py` (le kanban en dépend)
 - **Si une phase échoue** : arrêter, reporter le problème, ne pas silently skip
 - **Token awareness** : en mode auto sur grosse feature, signaler si > 50% budget tokens consommé
 - **Interface web** : rappeler l'URL à chaque étape significative

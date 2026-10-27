@@ -122,7 +122,22 @@ Une seule interface web pour les features de **tous** les projets : un onglet pa
 - `feature-serve` inscrit au passage le projet courant (nom = dossier du repo) s'il a des features.
 - Un projet inscrit pendant que le serveur tourne n'est rafraîchi en direct qu'après redémarrage de `feature-serve`.
 - `FEATURES_HUB_DIR` change l'emplacement du hub (tests).
+- Pages de suivi générées à chaque rechargement par `templates/feature-web/kanban_hook.py` : **Tableau de bord** (accueil), **En ce moment** (en cours, bloqué, attend votre Go), et un **Kanban** en tête de chaque onglet projet. Elles lisent `meta.json` et `tasks/tasks.json`, sans rien écrire dans les projets.
 - Les projets initialisés avant le hub gardent `.claude/features-web/` et `.claude/features/assets/` : inutiles, supprimables à la main.
+
+### `feature-tasks.py`
+
+Tient à jour `tasks/tasks.json`, la source du kanban. Le pipeline `/feature` l'appelle ; à la main :
+
+```bash
+F=<projet>/.claude/features/<slug>
+~/.claude/bin/feature-tasks.py import "$F" [--force]       # tableau résumé de tasks.md → tasks.json
+~/.claude/bin/feature-tasks.py set "$F" <ID> <todo|doing|blocked|done> [--note "..."] [--go|--no-go]
+~/.claude/bin/feature-tasks.py waiting "$F" [texte]        # ce qu'on attend de vous (vide : efface)
+~/.claude/bin/feature-tasks.py show "$F"
+```
+
+`import` reconnaît les colonnes par leur en-tête (ID, Titre, Statut, Type, Lot/Phase, Pts, Deps), traduit les statuts libres (`done (…)`, `in-progress`, `bloqué`, `reportée`…) et signale ceux qu'il ne comprend pas. Si l'implémentation est terminée, les tasks restées ouvertes passent en `done` avec la note « déduit ».
 
 ### `install.sh` (à la racine du framework)
 
