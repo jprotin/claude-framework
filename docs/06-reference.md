@@ -139,6 +139,31 @@ F=<projet>/.claude/features/<slug>
 
 `import` reconnaît les colonnes par leur en-tête (ID, Titre, Statut, Type, Lot/Phase, Pts, Deps), traduit les statuts libres (`done (…)`, `in-progress`, `bloqué`, `reportée`…) et signale ceux qu'il ne comprend pas. Si l'implémentation est terminée, les tasks restées ouvertes passent en `done` avec la note « déduit ».
 
+### `feature-promote.sh` et `feature-archive.sh` — versionnement des artéfacts
+
+Les artéfacts bruts restent dans `.claude/features/` (non versionné). Deux sorties, à activer **par projet** (désactivées par défaut) :
+
+| Option | Ce qui est versionné | Où |
+|---|---|---|
+| `promote` | la doc, la spec et le plan finaux de chaque feature | `docs/features/<slug>/` du repo projet |
+| `archive` | tous les artéfacts de toutes les features | repo privé central, un dossier par projet |
+
+```bash
+~/.claude/bin/feature-hub.sh options                         # état des options
+~/.claude/bin/feature-hub.sh option <projet> promote on      # ou archive on / off
+~/.claude/bin/feature-promote.sh <projet>/.claude/features/<slug> [--force]
+~/.claude/bin/feature-archive.sh init                        # une fois : ~/.claude/features-archive
+~/.claude/bin/feature-archive.sh sync [projet]              # copie + git add (tous les projets autorisés, ou un seul)
+~/.claude/bin/feature-archive.sh status                      # ce qui serait commité (lecture seule)
+~/.claude/bin/feature-archive.sh commit                      # gitleaks puis commit local ; push manuel ensuite
+```
+
+- `feature-promote.sh` ne remplace un fichier déjà promu qui diffère qu'avec `--force`, signale les liens relatifs qui ne suivront pas, et ne commite rien. Un brouillon d'ADR se formalise avec `/adr` dans `docs/adr/`.
+- `feature-archive.sh` ne contacte jamais le réseau : premier envoi avec `git -C ~/.claude/features-archive push -u origin main` (si le repo GitHub n'est pas vide : `pull origin main --allow-unrelated-histories` avant).
+- Un projet client ne doit être mis en `archive on` qu'avec l'accord de son propriétaire : l'archive est un repo personnel. Vérifier que le repo distant est **privé** avant le premier push.
+- Un projet passé en `archive off` (ou désinscrit) n'est plus copié, mais son dossier reste dans l'archive : `sync` le signale avec la commande pour le retirer (`git rm -r`). Rien n'est supprimé automatiquement.
+- `commit` refuse de commiter si gitleaks trouve un secret dans les fichiers synchronisés.
+
 ### `install.sh` (à la racine du framework)
 
 Setup des symlinks `~/.claude/` → framework, génération de `settings.json`, puis installation du groupe de prérequis `agentic` (mkdocs pour `/feature-serve`). À lancer sur nouvelle machine et après chaque `git pull` du framework.

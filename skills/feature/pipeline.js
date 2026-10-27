@@ -271,5 +271,5 @@ return {
     document: { status: 'done' },
   },
   webUrl: 'http://localhost:8888',
-  nextStep: `Vérifier ${featurePath}/validation/final-report.md, puis commiter la feature branch.`,
+  nextStep: `Vérifier ${featurePath}/validation/final-report.md, puis commiter la feature branch. Selon les options du projet (feature-hub.sh options) : promouvoir les livrables (feature-promote.sh) et synchroniser l'archive (feature-archive.sh sync), avec le Go de l'utilisateur.`,
 }
