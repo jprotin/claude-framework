@@ -7,13 +7,19 @@
 #   feature-hub.sh list                                      Liste les projets inscrits
 #   feature-hub.sh name-of <project-root>                    Nom sous lequel la racine est inscrite
 #   feature-hub.sh validate <project-name>                   Vérifie qu'un nom est utilisable
+#   feature-hub.sh option <project-name> <archive|promote> <on|off>
+#                                                            archive : copie vers le repo central
+#                                                            promote : livrables dans docs/ du projet
+#   feature-hub.sh option-of <project-name> <archive|promote> Affiche on/off (défaut : off)
+#   feature-hub.sh options                                   Options de tous les projets
 #   feature-hub.sh build                                     (Re)génère le hub (mkdocs.yml, liens, accueil)
 #
 # Un projet est identifié par sa racine : une racine déjà inscrite garde son nom,
 # et un nom déjà pris par une autre racine est refusé.
 #
 # Le hub vit dans ${FEATURES_HUB_DIR:-~/.claude/features-hub} :
-#   registry.json   {"projects": {"<nom>": "<racine du projet>"}}  — seule donnée persistante
+#   registry.json   {"projects": {"<nom>": "<racine>"}, "options": {"<nom>": {"archive": bool, ...}}}
+#                   — seule donnée persistante
 #   mkdocs.yml      généré depuis templates/feature-web/mkdocs.yml.template
 #   docs/<nom>      lien vers <racine>/.claude/features (un onglet par projet)
 #   pages de suivi  générées au build par templates/feature-web/kanban_hook.py
@@ -85,8 +91,54 @@ cmd_unregister() {
   jq -e --arg n "${name}" '.projects | has($n)' "${REGISTRY}" >/dev/null \
     || die "Projet '${name}' non inscrit"
   # shellcheck disable=SC2016  # $variables jq, pas shell
-  write_registry --arg n "${name}" 'del(.projects[$n])'
+  write_registry --arg n "${name}" 'del(.projects[$n]) | del(.options[$n])'
   log "Projet '${name}' retiré du registre (ses fichiers ne sont pas touchés)"
+}
+
+OPTIONS=(archive promote)
+
+validate_option() {
+  local option="$1" known
+  for known in "${OPTIONS[@]}"; do
+    [[ "${option}" == "${known}" ]] && return 0
+  done
+  die "Option inconnue : '${option}' (attendu : ${OPTIONS[*]})"
+}
+
+cmd_option() {
+  local usage="Usage: feature-hub.sh option <project-name> <archive|promote> <on|off>"
+  local name="${1:?${usage}}" option="${2:?${usage}}" value="${3:?${usage}}"
+  validate_option "${option}"
+  [[ "${value}" == "on" || "${value}" == "off" ]] || die "${usage}"
+  ensure_registry
+  # shellcheck disable=SC2016  # $variables jq, pas shell
+  jq -e --arg n "${name}" '.projects | has($n)' "${REGISTRY}" >/dev/null \
+    || die "Projet '${name}' non inscrit"
+  # shellcheck disable=SC2016  # $variables jq, pas shell
+  write_registry --arg n "${name}" --arg o "${option}" --argjson v "$([[ "${value}" == on ]] && echo true || echo false)" \
+    '.options[$n][$o] = $v'
+  log "Projet '${name}' : ${option} = ${value}"
+}
+
+cmd_option_of() {
+  local name="${1:?Usage: feature-hub.sh option-of <project-name> <archive|promote>}"
+  local option="${2:?Usage: feature-hub.sh option-of <project-name> <archive|promote>}"
+  validate_option "${option}"
+  ensure_registry
+  # shellcheck disable=SC2016  # $variables jq, pas shell
+  jq -r --arg n "${name}" --arg o "${option}" \
+    'if .options[$n][$o] == true then "on" else "off" end' "${REGISTRY}"
+}
+
+cmd_options() {
+  ensure_registry
+  printf '%-24s %-8s %-8s\n' "PROJET" "archive" "promote"
+  jq -r '. as $r | .projects | keys_unsorted[] as $n
+         | [$n, ($r.options[$n].archive // false), ($r.options[$n].promote // false)]
+         | map(if . == true then "on" elif . == false then "off" else . end) | @tsv' "${REGISTRY}" \
+    | while IFS=$'\t' read -r name archive promote; do
+        printf '%-24s %-8s %-8s\n' "${name}" "${archive}" "${promote}"
+      done
 }
 
 cmd_name_of() {
@@ -171,6 +223,9 @@ case "${1:-}" in
   list)       cmd_list ;;
   name-of)    shift; cmd_name_of "$@" ;;
   validate)   shift; validate_name "${1:-}" ;;
+  option)     shift; cmd_option "$@" ;;
+  option-of)  shift; cmd_option_of "$@" ;;
+  options)    cmd_options ;;
   build)      cmd_build ;;
-  *)          sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *)          sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

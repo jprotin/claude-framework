@@ -177,6 +177,14 @@ En mode interactif : gate après chaque block de tasks (pas chaque task individu
 1. Rédiger `docs/feature-doc.md` depuis tous les artéfacts produits, pour toute personne qui découvre la feature : « En bref », ce que ça change et comment s'en servir, points d'attention, détails techniques repliés
 2. Proposer l'entrée CHANGELOG
 3. Mettre à jour `meta.json` : `"status": "done"`
+4. Versionnement des livrables, selon les options du projet **sous son nom dans le hub** (qui peut différer du dossier) :
+   ```bash
+   P="$(bash ~/.claude/bin/feature-hub.sh name-of "$(git rev-parse --show-toplevel)")"
+   bash ~/.claude/bin/feature-hub.sh option-of "$P" promote   # on → étape a
+   bash ~/.claude/bin/feature-hub.sh option-of "$P" archive   # on → étape b
+   ```
+   a. `bash ~/.claude/bin/feature-promote.sh "$F"` (copie doc, spec et plan finaux dans `docs/features/<slug>/` du projet), puis proposer le commit sur la branche de la feature (Go utilisateur)
+   b. `bash ~/.claude/bin/feature-archive.sh sync "$P"` (ce projet seulement), puis proposer `feature-archive.sh commit` (Go utilisateur) ; le push reste manuel
 
 ### Format du rapport final (mode auto)
 
@@ -203,7 +211,7 @@ En mode interactif : gate après chaque block de tasks (pas chaque task individu
 <items des rapports de validation qui méritent attention>
 
 ### Prochaine étape
-<proposition : commit sur feature branch, PR vers develop, etc.>
+<proposition : commit sur feature branch, PR vers develop, promotion des livrables et synchronisation de l'archive selon les options du projet (Phase 6, étape 4)>
 
 Interface web : http://localhost:8888/<projet>/<feature-slug>/
 ```
