@@ -105,6 +105,25 @@ Installe / met à jour les outils prérequis.
 Groupes : core, secrets, python, terraform, docker, ansible, sql, kubernetes, agentic
 ```
 
+### `feature-hub.sh` et `feature-serve.sh`
+
+Une seule interface web pour les features de **tous** les projets : un onglet par projet.
+`feature-init.sh` inscrit le projet automatiquement ; `feature-serve.sh` régénère le hub
+(`~/.claude/features-hub/`) puis le sert sur http://localhost:8888.
+
+```bash
+~/.claude/bin/feature-hub.sh list                          # projets inscrits
+~/.claude/bin/feature-hub.sh register <nom> [racine]       # inscrire un projet à la main
+~/.claude/bin/feature-hub.sh unregister <nom>              # le retirer (fichiers intacts)
+~/.claude/bin/feature-serve.sh [port]                      # lancer l'interface
+```
+
+- Un projet est identifié par son dossier : déjà inscrit, il garde son nom ; un nom pris par un autre dossier est refusé. Noms autorisés : lettres, chiffres, `.`, `_`, `-`.
+- `feature-serve` inscrit au passage le projet courant (nom = dossier du repo) s'il a des features.
+- Un projet inscrit pendant que le serveur tourne n'est rafraîchi en direct qu'après redémarrage de `feature-serve`.
+- `FEATURES_HUB_DIR` change l'emplacement du hub (tests).
+- Les projets initialisés avant le hub gardent `.claude/features-web/` et `.claude/features/assets/` : inutiles, supprimables à la main.
+
 ### `install.sh` (à la racine du framework)
 
 Setup des symlinks `~/.claude/` → framework, génération de `settings.json`, puis installation du groupe de prérequis `agentic` (mkdocs pour `/feature-serve`). À lancer sur nouvelle machine et après chaque `git pull` du framework.

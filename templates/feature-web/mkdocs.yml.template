@@ -1,5 +1,5 @@
-site_name: "Features — {{PROJECT_NAME}}"
-docs_dir: "{{FEATURES_PATH}}"
+site_name: "Features — tous les projets"
+docs_dir: "{{DOCS_PATH}}"
 site_dir: "{{SITE_PATH}}"
 
 theme:
@@ -21,9 +21,9 @@ theme:
         icon: material/brightness-4
         name: Mode clair
   features:
-    - navigation.tabs           # features en onglets (1 tab = 1 feature)
+    - navigation.tabs           # projets en onglets (1 tab = 1 projet)
     - navigation.tabs.sticky
-    - navigation.sections       # sections dépliables dans sidebar
+    - navigation.sections       # features en sections dans la sidebar
     - navigation.expand
     - navigation.top            # bouton retour en haut
     - navigation.footer
@@ -38,6 +38,7 @@ plugins:
   - search:
       lang: fr
       separator: '[\s\-\.]+'
+  - awesome-pages
 
 markdown_extensions:
   - admonition

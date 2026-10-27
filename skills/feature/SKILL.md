@@ -31,7 +31,9 @@ Exécuter le script d'initialisation :
 bash ~/.claude/bin/feature-init.sh "<feature-slug>" "<projet-courant>"
 ```
 
-Ce script crée l'arborescence `.claude/features/<slug>/` et le fichier `meta.json`.
+`<projet-courant>` = nom du dossier racine du repo (`basename $(git rev-parse --show-toplevel)`) : lettres, chiffres, `.`, `_`, `-`. Si le projet est déjà inscrit au hub sous un autre nom, ce nom est conservé.
+
+Ce script crée l'arborescence `.claude/features/<slug>/` et le fichier `meta.json`, et inscrit le projet dans l'interface web unique (tous projets).
 
 Confirmer à l'utilisateur : « Feature `<slug>` initialisée. Phase 1 — Spec en cours... »
 
@@ -77,7 +79,7 @@ Afficher un résumé structuré :
 - spec/analysis-challenge.md
 <si ADR> - spec/adr-draft.md
 
-Interface web : http://localhost:8888 (lancer `feature-serve` si pas démarré)
+Interface web : http://localhost:8888/<projet>/<slug>/ (lancer `feature-serve` si pas démarré)
 ```
 
 **Étape 2d — Gate utilisateur (obligatoire)**
@@ -181,7 +183,7 @@ En mode interactif : gate après chaque block de tasks (pas chaque task individu
 ### Prochaine étape
 <proposition : commit sur feature branch, PR vers develop, etc.>
 
-Interface web : http://localhost:8888/<feature-slug>
+Interface web : http://localhost:8888/<projet>/<feature-slug>/
 ```
 
 ---

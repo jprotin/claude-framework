@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# feature-init.sh — Initialise l'arborescence d'une feature et son mkdocs.yml
+# feature-init.sh — Initialise l'arborescence d'une feature et inscrit le projet au hub web
 # Usage: feature-init.sh <feature-slug> <project-name> [mode: auto|interactive]
 set -euo pipefail
 
@@ -8,11 +8,12 @@ PROJECT_NAME="${2:?Usage: feature-init.sh <slug> <project-name> [auto|interactiv
 MODE="${3:-interactive}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-FRAMEWORK_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 FEATURES_DIR="${PROJECT_ROOT}/.claude/features"
 FEATURE_DIR="${FEATURES_DIR}/${SLUG}"
-ASSETS_DIR="${FEATURES_DIR}/assets"  # partagé : extra_css est résolu depuis docs_dir (= features/)
+
+# Nom vérifié avant toute création : il devient l'onglet du projet dans le hub web.
+bash "${SCRIPT_DIR}/feature-hub.sh" validate "${PROJECT_NAME}"
 
 # ── Créer l'arborescence ───────────────────────────────────────────────────
 
@@ -21,8 +22,7 @@ mkdir -p \
   "${FEATURE_DIR}/plan" \
   "${FEATURE_DIR}/tasks" \
   "${FEATURE_DIR}/validation" \
-  "${FEATURE_DIR}/docs" \
-  "${ASSETS_DIR}"
+  "${FEATURE_DIR}/docs"
 
 # ── meta.json ─────────────────────────────────────────────────────────────
 
@@ -132,26 +132,14 @@ nav:
   - Changelog: changelog-entry.md
 EOF
 
-# ── Copier les assets CSS ──────────────────────────────────────────────────
+# ── Inscription au hub web (un seul MkDocs pour tous les projets) ─────────
 
-cp "${FRAMEWORK_DIR}/templates/feature-web/extra.css" "${ASSETS_DIR}/extra.css" 2>/dev/null || true
-
-# ── mkdocs.yml projet ─────────────────────────────────────────────────────
-# Config dans un dossier voisin de features/ : mkdocs refuse un docs_dir parent
-# du fichier de config (et un site_dir inclus dans docs_dir).
-
-WEB_DIR="${PROJECT_ROOT}/.claude/features-web"
-MKDOCS_YML="${WEB_DIR}/mkdocs.yml"
-mkdir -p "${WEB_DIR}"
-
-if [[ ! -f "${MKDOCS_YML}" ]]; then
-  sed \
-    -e "s|{{PROJECT_NAME}}|${PROJECT_NAME}|g" \
-    -e "s|{{FEATURES_PATH}}|${FEATURES_DIR}|g" \
-    -e "s|{{SITE_PATH}}|${WEB_DIR}/.site|g" \
-    "${FRAMEWORK_DIR}/templates/feature-web/mkdocs.yml.template" \
-    > "${MKDOCS_YML}"
-  echo "[feature-init] mkdocs.yml créé : ${MKDOCS_YML}"
+# Non fatal : la feature est déjà créée, seule sa visibilité dans le hub est en jeu.
+# Le build rafraîchit l'accueil ; un projet nouveau n'est surveillé qu'au prochain feature-serve.
+if bash "${SCRIPT_DIR}/feature-hub.sh" register "${PROJECT_NAME}" "${PROJECT_ROOT}"; then
+  bash "${SCRIPT_DIR}/feature-hub.sh" build >/dev/null
+else
+  echo "[feature-init] Inscription au hub échouée : feature-hub.sh register <nom> pour réessayer."
 fi
 
 # ── .gitignore features dir ───────────────────────────────────────────────
@@ -165,4 +153,5 @@ if [[ -f "${GITIGNORE}" ]] && ! grep -q "^\.claude/features" "${GITIGNORE}"; the
 fi
 
 echo "[feature-init] Feature '${SLUG}' initialisée dans ${FEATURE_DIR}"
-echo "[feature-init] Démarrer l'interface web : feature-serve"
+HUB_NAME="$(bash "${SCRIPT_DIR}/feature-hub.sh" name-of "${PROJECT_ROOT}" 2>/dev/null || true)"
+echo "[feature-init] Interface web (tous projets) : feature-serve → http://localhost:8888/${HUB_NAME:-${PROJECT_NAME}}/${SLUG}/"
