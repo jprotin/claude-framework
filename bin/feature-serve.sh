@@ -1,24 +1,12 @@
 #!/usr/bin/env bash
-# feature-serve.sh — Démarre l'interface web MkDocs pour les features du projet courant
+# feature-serve.sh — Démarre l'interface web MkDocs unique pour les features de tous les projets
 # Usage: feature-serve [port]
 set -euo pipefail
 
 PORT="${1:-8888}"
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-FEATURES_DIR="${PROJECT_ROOT}/.claude/features"
-MKDOCS_YML="${PROJECT_ROOT}/.claude/features-web/mkdocs.yml"
-
-# ── Vérifications ──────────────────────────────────────────────────────────
-
-if [[ ! -d "${FEATURES_DIR}" ]]; then
-  echo "Aucune feature initialisée. Lance d'abord /feature pour créer une feature."
-  exit 1
-fi
-
-if [[ ! -f "${MKDOCS_YML}" ]]; then
-  echo "${MKDOCS_YML} introuvable. Relance /feature (feature-init) pour le générer."
-  exit 1
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HUB_DIR="${FEATURES_HUB_DIR:-${HOME}/.claude/features-hub}"
+MKDOCS_YML="${HUB_DIR}/mkdocs.yml"
 
 # ── Vérifier mkdocs + thème material + plugin awesome-pages ──────────────
 # Pas d'installation ici : elle passe par claude-install-prereqs.sh (venv pipx isolé).
@@ -35,29 +23,50 @@ fi
 MKDOCS_PYTHON="$(head -1 "$(readlink -f "$(command -v mkdocs)")" | sed 's/^#!//')"
 has_module() { "${MKDOCS_PYTHON}" -c "import $1" &>/dev/null; }
 
-if ! has_module material; then
-  echo "Thème mkdocs-material absent de l'environnement de mkdocs. ${INSTALL_HINT}"
+for module in material mkdocs_awesome_pages_plugin; do
+  if ! has_module "${module}"; then
+    echo "Module ${module} absent de l'environnement de mkdocs. ${INSTALL_HINT}"
+    exit 1
+  fi
+done
+
+# ── Port libre ? (ancien feature-serve par projet encore lancé, typiquement) ─
+
+if command -v ss &>/dev/null && ss -ltnH "sport = :${PORT}" | grep -q .; then
+  echo "Le port ${PORT} est déjà utilisé :"
+  ss -ltnpH "sport = :${PORT}" 2>/dev/null | sed 's/^/  /'
+  echo "Arrêter ce processus, ou choisir un autre port : feature-serve <port>"
   exit 1
 fi
 
-# ── Mettre à jour mkdocs.yml si awesome-pages disponible ─────────────────
+# ── Projet courant inscrit au passage (features créées avant le hub) ──────
 
-if ! grep -q "awesome-pages" "${MKDOCS_YML}" 2>/dev/null; then
-  if has_module mkdocs_awesome_pages_plugin; then
-    # Insérer awesome-pages dans les plugins
-    sed -i 's/^plugins:$/plugins:\n  - awesome-pages/' "${MKDOCS_YML}"
-  fi
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+# Non fatal : un nom de dossier déjà pris ou invalide ne doit pas empêcher de servir le hub.
+if [[ -n "${PROJECT_ROOT}" && -d "${PROJECT_ROOT}/.claude/features" \
+      && -z "$(bash "${SCRIPT_DIR}/feature-hub.sh" name-of "${PROJECT_ROOT}")" ]]; then
+  bash "${SCRIPT_DIR}/feature-hub.sh" register "$(basename "${PROJECT_ROOT}")" "${PROJECT_ROOT}" \
+    || echo "Projet courant non inscrit : feature-hub.sh register <nom> pour l'ajouter."
 fi
 
+bash "${SCRIPT_DIR}/feature-hub.sh" build
+
 # ── Lancer le serveur ─────────────────────────────────────────────────────
+# Chaque projet est un lien dans docs/ : on surveille aussi sa cible réelle,
+# sinon le hot-reload ne voit pas les fichiers écrits par le pipeline.
+
+watch_args=()
+while IFS= read -r link; do
+  watch_args+=(--watch "$(readlink -f "${link}")")
+done < <(find "${HUB_DIR}/docs" -mindepth 1 -maxdepth 1 -type l)
 
 echo ""
-echo "Interface web features : http://localhost:${PORT}"
+echo "Interface web features (tous projets) : http://localhost:${PORT}"
 echo "Hot-reload actif — les documents générés par le pipeline s'affichent en temps réel."
 echo "Ctrl+C pour arrêter."
 echo ""
 
-cd "${FEATURES_DIR}" && mkdocs serve \
+cd "${HUB_DIR}" && mkdocs serve \
   --config-file "${MKDOCS_YML}" \
   --dev-addr "127.0.0.1:${PORT}" \
-  --watch "${FEATURES_DIR}"
+  "${watch_args[@]}"
